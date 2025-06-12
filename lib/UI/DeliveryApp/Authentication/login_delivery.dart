@@ -8,6 +8,7 @@ import 'package:sentinix_ecommerce/Reusable/elevated_button.dart';
 import 'package:sentinix_ecommerce/Reusable/image.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
 import 'package:sentinix_ecommerce/UI/DeliveryApp/Authentication/Widget/signup_delivery_animation_widget.dart';
+import 'package:sentinix_ecommerce/UI/DeliveryApp/Authentication/deliveryman_signup.dart';
 
 class LoginDeliveryMan extends StatelessWidget {
   const LoginDeliveryMan({
@@ -98,11 +99,11 @@ class _LoginDeliveryManViewState extends State<LoginDeliveryManView> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //       builder: (_) => const SignUpScreen()),
-                          // );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const DeliveryManSignup()),
+                          );
                         },
                         child: Text(
                           "Sign up",
