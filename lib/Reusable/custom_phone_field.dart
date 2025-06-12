@@ -30,7 +30,7 @@ class _CustomPhoneFieldState extends State<CustomPhoneField> {
         labelText: 'Phone Number',
         labelStyle: MyTextStyle.f14(greyColor),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(12),
         ),
         focusedBorder: OutlineInputBorder(
           borderSide: BorderSide(color: appPrimaryColor, width: 2),

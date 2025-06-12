@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
-
 import 'package:sentinix_ecommerce/UI/UserApp/Authentication/login.dart';
-
 import 'package:slide_to_act/slide_to_act.dart';
 
 class AnimatedLoginDelivery extends StatefulWidget {

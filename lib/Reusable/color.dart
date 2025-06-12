@@ -15,6 +15,7 @@ const Color appGreenColor = Color(0xFF147338);
 
 const Color orangeColor = Colors.orange;
 const Color blackColor = Colors.black;
+const Color blackColor54 = Colors.black54;
 const Color blueColor = Colors.blue;
 const Color whiteColor = Colors.white;
 const Color redColor = Colors.red;
@@ -28,3 +29,5 @@ const Color pinkColor =
 // Example of defining a paragraph color if needed
 const Color paragraphColor = Color(0xFF333333);
 const Color appBarBackgroundColordark = const Color(0xFF424242);
+
+//Navigation Bar
