@@ -101,7 +101,7 @@ class CustomTextField extends StatelessWidget {
                   counterText: "",
                   hintText: hint,
                   hintStyle: MediaQuery.of(context).size.width < 650
-                      ? MyTextStyle.f14(greyColor, weight: FontWeight.w300)
+                      ? MyTextStyle.f14(greyColor, weight: FontWeight.w500)
                       : MyTextStyle.f18(greyColor, weight: FontWeight.w300),
                   prefixText: prefixText,
                   prefixStyle: MediaQuery.of(context).size.width < 650

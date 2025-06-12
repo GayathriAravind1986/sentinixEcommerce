@@ -13,4 +13,5 @@ class Images {
   // --- Images (PNG/JPG) ---
   static const String logo = 'assets/image/sentinix_logo.png';
   static const String loginImage = 'assets/image/login_Image.png';
+  static const String backArrow = "assets/image/backarrow.png";
 }
