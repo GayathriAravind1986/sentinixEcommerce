@@ -8,6 +8,7 @@ import 'package:sentinix_ecommerce/Reusable/elevated_button.dart';
 import 'package:sentinix_ecommerce/Reusable/image.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Authentication/Widget/signup_animation_widget.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Authentication/user_signup.dart';
 
 class LoginCustomer extends StatelessWidget {
   const LoginCustomer({
@@ -98,11 +99,11 @@ class _LoginCustomerViewState extends State<LoginCustomerView> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //       builder: (_) => const SignUpScreen()),
-                          // );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const UserSignup()),
+                          );
                         },
                         child: Text(
                           "Sign up",
