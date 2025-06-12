@@ -4,9 +4,9 @@ import 'package:sentinix_ecommerce/Reusable/color.dart';
 class MyTextStyle {
   static TextStyle f55(Color color,
       {FontWeight? weight,
-      FontStyle? fontStyle,
-      Color? decorationColor,
-      TextDecoration? textDecoration}) {
+        FontStyle? fontStyle,
+        Color? decorationColor,
+        TextDecoration? textDecoration}) {
     return TextStyle(
       fontFamily: "Montserrat",
       color: color,
@@ -20,9 +20,9 @@ class MyTextStyle {
 
   static TextStyle f48(Color color,
       {FontWeight? weight,
-      FontStyle? fontStyle,
-      Color? decorationColor,
-      TextDecoration? textDecoration}) {
+        FontStyle? fontStyle,
+        Color? decorationColor,
+        TextDecoration? textDecoration}) {
     return TextStyle(
       fontFamily: "Montserrat",
       color: color,
@@ -36,9 +36,9 @@ class MyTextStyle {
 
   static TextStyle f38(Color color,
       {FontWeight? weight,
-      FontStyle? fontStyle,
-      Color? decorationColor, // Changed to Color? for consistency
-      TextDecoration? textDecoration}) {
+        FontStyle? fontStyle,
+        Color? decorationColor, // Changed to Color? for consistency
+        TextDecoration? textDecoration}) {
     return TextStyle(
       fontFamily: "Montserrat",
       color: color,
@@ -52,9 +52,9 @@ class MyTextStyle {
 
   static TextStyle f36(Color color,
       {FontWeight? weight,
-      FontStyle? fontStyle,
-      Color? decorationColor,
-      TextDecoration? textDecoration}) {
+        FontStyle? fontStyle,
+        Color? decorationColor,
+        TextDecoration? textDecoration}) {
     return TextStyle(
       fontFamily: "Montserrat",
       color: color,
@@ -67,10 +67,10 @@ class MyTextStyle {
   }
 
   static TextStyle f32(
-    Color color, {
-    FontWeight? weight,
-    FontStyle? fontStyle,
-  }) {
+      Color color, {
+        FontWeight? weight,
+        FontStyle? fontStyle,
+      }) {
     return TextStyle(
       fontFamily: "Montserrat",
       color: color,
@@ -81,10 +81,10 @@ class MyTextStyle {
   }
 
   static TextStyle f30(
-    Color color, {
-    FontWeight? weight,
-    FontStyle? fontStyle,
-  }) {
+      Color color, {
+        FontWeight? weight,
+        FontStyle? fontStyle,
+      }) {
     return TextStyle(
       fontFamily: "Montserrat",
       color: color,
@@ -95,10 +95,10 @@ class MyTextStyle {
   }
 
   static TextStyle f28(
-    Color color, {
-    FontWeight? weight,
-    FontStyle? fontStyle,
-  }) {
+      Color color, {
+        FontWeight? weight,
+        FontStyle? fontStyle,
+      }) {
     return TextStyle(
       fontFamily: "Montserrat",
       color: color,
@@ -109,10 +109,10 @@ class MyTextStyle {
   }
 
   static TextStyle f26(
-    Color color, {
-    FontWeight? weight,
-    FontStyle? fontStyle,
-  }) {
+      Color color, {
+        FontWeight? weight,
+        FontStyle? fontStyle,
+      }) {
     return TextStyle(
       fontFamily: "Montserrat",
       color: color,
@@ -123,10 +123,10 @@ class MyTextStyle {
   }
 
   static TextStyle f24(
-    Color color, {
-    FontWeight? weight,
-    FontStyle? fontStyle,
-  }) {
+      Color color, {
+        FontWeight? weight,
+        FontStyle? fontStyle,
+      }) {
     return TextStyle(
       fontFamily: "Montserrat",
       color: color,
@@ -138,9 +138,9 @@ class MyTextStyle {
 
   static TextStyle f22(Color color,
       {FontWeight? weight,
-      FontStyle? fontStyle,
-      Color? decorationColor,
-      TextDecoration? textDecoration}) {
+        FontStyle? fontStyle,
+        Color? decorationColor,
+        TextDecoration? textDecoration}) {
     return TextStyle(
       fontFamily: "Montserrat",
       color: color,
@@ -153,10 +153,10 @@ class MyTextStyle {
   }
 
   static TextStyle f20(
-    Color color, {
-    FontWeight? weight,
-    FontStyle? fontStyle,
-  }) {
+      Color color, {
+        FontWeight? weight,
+        FontStyle? fontStyle,
+      }) {
     return TextStyle(
       fontFamily: "Montserrat",
       color: color,
@@ -168,9 +168,9 @@ class MyTextStyle {
 
   static TextStyle f18(Color color,
       {FontWeight? weight,
-      FontStyle? fontStyle,
-      Color? decorationColor,
-      TextDecoration? textDecoration}) {
+        FontStyle? fontStyle,
+        Color? decorationColor,
+        TextDecoration? textDecoration}) {
     return TextStyle(
       fontFamily: "Montserrat",
       color: color,
@@ -183,10 +183,10 @@ class MyTextStyle {
   }
 
   static TextStyle f17(
-    Color color, {
-    FontWeight? weight,
-    FontStyle? fontStyle,
-  }) {
+      Color color, {
+        FontWeight? weight,
+        FontStyle? fontStyle,
+      }) {
     return TextStyle(
       fontFamily: "Montserrat",
       color: color,
@@ -197,11 +197,11 @@ class MyTextStyle {
   }
 
   static TextStyle f58(
-    Color color, {
-    FontWeight? weight,
-    FontStyle? fontStyle,
-    double? height,
-  }) {
+      Color color, {
+        FontWeight? weight,
+        FontStyle? fontStyle,
+        double? height,
+      }) {
     return TextStyle(
       fontFamily: "Montserrat",
       color: color,
@@ -212,11 +212,11 @@ class MyTextStyle {
   }
 
   static TextStyle f16(
-    Color color, {
-    FontWeight? weight,
-    FontStyle? fontStyle,
-    double? height,
-  }) {
+      Color color, {
+        FontWeight? weight,
+        FontStyle? fontStyle,
+        double? height,
+      }) {
     return TextStyle(
       fontFamily: "Montserrat",
       color: color,
@@ -228,9 +228,9 @@ class MyTextStyle {
 
   static TextStyle f15(Color color,
       {FontWeight? weight,
-      FontStyle? fontStyle,
-      Color? decorationColor,
-      TextDecoration? textDecoration}) {
+        FontStyle? fontStyle,
+        Color? decorationColor,
+        TextDecoration? textDecoration}) {
     return TextStyle(
       fontFamily: "Montserrat",
       color: color,
@@ -243,12 +243,12 @@ class MyTextStyle {
   }
 
   static TextStyle f14(
-    Color color, {
-    FontWeight? weight,
-    FontStyle? fontStyle,
-    Color? decorationColor,
-    TextDecoration? textDecoration,
-  }) {
+      Color color, {
+        FontWeight? weight,
+        FontStyle? fontStyle,
+        Color? decorationColor,
+        TextDecoration? textDecoration,
+      }) {
     return TextStyle(
       fontFamily: "Montserrat",
       color: color,
@@ -261,10 +261,10 @@ class MyTextStyle {
   }
 
   static TextStyle f13(
-    Color color, {
-    FontWeight? weight,
-    FontStyle? fontStyle,
-  }) {
+      Color color, {
+        FontWeight? weight,
+        FontStyle? fontStyle,
+      }) {
     return TextStyle(
       fontFamily: "Montserrat",
       color: color,
@@ -276,9 +276,9 @@ class MyTextStyle {
 
   static TextStyle f12(Color color,
       {FontWeight? weight,
-      FontStyle? fontStyle,
-      Color? decorationColor,
-      TextDecoration? textDecoration}) {
+        FontStyle? fontStyle,
+        Color? decorationColor,
+        TextDecoration? textDecoration}) {
     return TextStyle(
       fontFamily: "Montserrat",
       color: color,
@@ -292,9 +292,9 @@ class MyTextStyle {
 
   static TextStyle f10(Color color,
       {FontWeight? weight,
-      FontStyle? fontStyle,
-      Color? decorationColor,
-      TextDecoration? textDecoration}) {
+        FontStyle? fontStyle,
+        Color? decorationColor,
+        TextDecoration? textDecoration}) {
     return TextStyle(
       fontFamily: "Montserrat",
       color: color,
@@ -307,10 +307,10 @@ class MyTextStyle {
   }
 
   static TextStyle f8(
-    Color color, {
-    FontWeight? weight,
-    FontStyle? fontStyle,
-  }) {
+      Color color, {
+        FontWeight? weight,
+        FontStyle? fontStyle,
+      }) {
     return TextStyle(
       fontFamily: "Montserrat",
       color: color,
