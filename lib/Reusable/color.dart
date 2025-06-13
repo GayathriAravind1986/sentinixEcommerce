@@ -16,6 +16,7 @@ const Color appGreenColor = Color(0xFF147338);
 const Color orangeColor = Colors.orange;
 const Color blackColor = Colors.black;
 const Color blackColor54 = Colors.black54;
+Color? greyShade300 = Colors.grey[300];
 const Color blueColor = Colors.blue;
 const Color whiteColor = Colors.white;
 const Color redColor = Colors.red;
@@ -30,4 +31,4 @@ const Color pinkColor =
 const Color paragraphColor = Color(0xFF333333);
 const Color appBarBackgroundColordark = const Color(0xFF424242);
 
-//Navigation Bar
+//Home_Screen Bar

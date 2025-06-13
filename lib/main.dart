@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:overlay_support/overlay_support.dart';
-import 'package:sentinix_ecommerce/Bloc/observer/observer.dart';
-import 'package:sentinix_ecommerce/Bloc/theme_cubit.dart';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
-import 'package:sentinix_ecommerce/UI/SplashScreen/splash_screen.dart';
+import 'package:sentinix_ecommerce/UI/Navigation_Bar/navigation_bar.dart';
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([
+  await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  //await cart.loadCartItems();
-  Bloc.observer = AppBlocObserver();
+
   runApp(const App());
 }
 
@@ -24,61 +19,32 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => ThemeCubit(),
-      child: const MyApp(),
-    );
-  }
-}
-
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  @override
-  initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<ThemeCubit, ThemeData>(builder: (_, theme) {
-      return OverlaySupport.global(
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'Ecommerce',
-          theme: ThemeData(
-            primaryColor: appPrimaryColor,
-            unselectedWidgetColor: appPrimaryColor,
-            fontFamily: "Montserrat-Regular",
+    return OverlaySupport.global(
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Sentinix Ecommerce',
+        theme: ThemeData(
+          scaffoldBackgroundColor: appSecondaryColor,
+          primaryColor: appPrimaryColor,
+          unselectedWidgetColor: appPrimaryColor,
+          fontFamily: "Montserrat-Regular",
+          colorScheme: ColorScheme.fromSwatch().copyWith(
+            secondary: appSecondaryColor,
           ),
-          darkTheme: ThemeData.light(),
-          themeMode: ThemeMode.light,
-          builder: (context, child) {
-            return MediaQuery(
-              data: MediaQuery.of(context)
-                  .copyWith(textScaler: const TextScaler.linear(1.0)),
-              child: ScrollConfiguration(
-                behavior: MyBehavior(),
-                child: child!,
-              ),
-            );
-          },
-          home: const SplashScreen(),
         ),
-      );
-    });
-  }
-}
-
-class MyBehavior extends ScrollBehavior {
-  @override
-  Widget buildOverscrollIndicator(
-      BuildContext context, Widget child, ScrollableDetails details) {
-    return child;
+        builder: (context, child) {
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              textScaler: const TextScaler.linear(1.0),
+            ),
+            child: ScrollConfiguration(
+              behavior: MyBehavior(),
+              child: child!,
+            ),
+          );
+        },
+        home: const DashboardScreen(),
+      ),
+    );
   }
 }

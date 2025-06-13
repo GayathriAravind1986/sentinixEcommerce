@@ -9,6 +9,7 @@ import 'package:sentinix_ecommerce/Reusable/image.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
 import 'package:sentinix_ecommerce/UI/DeliveryApp/Authentication/Widget/signup_delivery_animation_widget.dart';
 import 'package:sentinix_ecommerce/UI/DeliveryApp/Authentication/deliveryman_signup.dart';
+import 'package:sentinix_ecommerce/UI/DeliveryApp/Authentication/otp_verification_delivery.dart';
 
 class LoginDeliveryMan extends StatelessWidget {
   const LoginDeliveryMan({
@@ -85,7 +86,11 @@ class _LoginDeliveryManViewState extends State<LoginDeliveryManView> {
                 CustomButton(
                   text: "Continue",
                   onPressed: () {
-                    debugPrint("Phone: $completePhoneNumber");
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const DeliveryOTPVerify()),
+                    );
                   },
                 ),
                 const SizedBox(height: 20),

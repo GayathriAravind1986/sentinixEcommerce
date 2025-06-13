@@ -1,89 +1,73 @@
 import 'package:flutter/material.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Profile/profile_screen.dart';
+import 'package:sentinix_ecommerce/Reusable/color.dart';
+import '../../Reusable/color.dart';
+
+class NavigationBarScreen extends StatefulWidget {
+  const NavigationBarScreen({super.key});
+
+  @override
+  State<NavigationBarScreen> createState() => _NavigationBarScreenState();
+}
+
+class _NavigationBarScreenState extends State<NavigationBarScreen> {
+  int _currentIndex = 0;
 
 
-
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: appPrimaryColor,
-        colorScheme: ColorScheme.fromSwatch().copyWith(secondary: appSecondaryColor),
+    return WillPopScope(
+      onWillPop: () async {
+        if (_currentIndex != 0) {
+          setState(() => _currentIndex = 0);
+          return false;
+        }
+        return true;
+      },
+      child: Scaffold(
+        body: IndexedStack(
+          index: _currentIndex,
+          children: _pages,
+        ),
+        bottomNavigationBar: CustomBottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (index) => setState(() => _currentIndex = index),
+        ),
       ),
-      home: const HomeScreen(),
     );
   }
 }
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
+class CustomBottomNavigationBar extends StatelessWidget {
+  final int currentIndex;
+  final ValueChanged<int> onTap;
 
-class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
+  const CustomBottomNavigationBar({
+    super.key,
+    required this.currentIndex,
+    required this.onTap,
+  });
 
-  final List<IconData> _icons = [
-    Icons.home,
-    Icons.shopping_bag_outlined,
-    Icons.chat_bubble_outline,
-    Icons.person_outline,
+  final List<BottomNavigationBarItem> navItems = const [
+    BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+    BottomNavigationBarItem(icon: Icon(Icons.event), label: 'Order'),
+    BottomNavigationBarItem(icon: Icon(Icons.lightbulb), label: 'Notification'),
+    BottomNavigationBarItem(icon: Icon(Icons.contact_mail), label: 'profile'),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.blueGrey[50],
-      body: Center(
-        child: Text(
-          'Page ${_selectedIndex + 1}',
-          style: const TextStyle(fontSize: 24, color: Colors.black87),
-        ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16),
-        child: Container(
-          height: 70,
-          decoration: BoxDecoration(
-            color: appPrimaryColor,
-            borderRadius: BorderRadius.circular(40),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.15),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(_icons.length, (index) {
-              bool isSelected = index == _selectedIndex;
-              return GestureDetector(
-                onTap: () => setState(() => _selectedIndex = index),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: isSelected ? appSecondaryColor : Colors.transparent,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    _icons[index],
-                    color: isSelected ? Colors.white : Colors.white70,
-                    size: 26,
-                  ),
-                ),
-              );
-            }),
-          ),
-        ),
-      ),
+    return BottomNavigationBar(
+      currentIndex: currentIndex,
+      showUnselectedLabels: true,
+      selectedFontSize: 14,
+      unselectedFontSize: 12,
+      type: BottomNavigationBarType.fixed,
+      selectedItemColor: appPrimaryColor,
+      unselectedItemColor: blackColor.withOpacity(0.5),
+      backgroundColor: appSecondaryColor ,
+      onTap: onTap,
+      items: navItems,
     );
   }
 }

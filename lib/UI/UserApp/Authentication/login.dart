@@ -8,6 +8,7 @@ import 'package:sentinix_ecommerce/Reusable/elevated_button.dart';
 import 'package:sentinix_ecommerce/Reusable/image.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Authentication/Widget/signup_animation_widget.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Authentication/otp_verfication_user.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Authentication/user_signup.dart';
 
 class LoginCustomer extends StatelessWidget {
@@ -85,7 +86,10 @@ class _LoginCustomerViewState extends State<LoginCustomerView> {
                 CustomButton(
                   text: "Continue",
                   onPressed: () {
-                    debugPrint("Phone: $completePhoneNumber");
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const UserOTPVerify()),
+                    );
                   },
                 ),
                 const SizedBox(height: 20),
