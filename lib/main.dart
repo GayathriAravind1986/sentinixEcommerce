@@ -7,6 +7,8 @@ import 'package:sentinix_ecommerce/Bloc/observer/observer.dart';
 import 'package:sentinix_ecommerce/Bloc/theme_cubit.dart';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/UI/SplashScreen/splash_screen.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Notifications/notification_screen/notification_bloc_screen.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -68,7 +70,7 @@ class _MyAppState extends State<MyApp> {
               ),
             );
           },
-          home: const SplashScreen(),
+          home: const NotificationScreen(),
         ),
       );
     });
