@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
-
-
+import 'package:sentinix_ecommerce/Reusable/color.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -11,7 +9,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: appPrimaryColor,
-        colorScheme: ColorScheme.fromSwatch().copyWith(secondary: appSecondaryColor),
+        colorScheme:
+            ColorScheme.fromSwatch().copyWith(secondary: appSecondaryColor),
       ),
       home: const HomeScreen(),
     );
