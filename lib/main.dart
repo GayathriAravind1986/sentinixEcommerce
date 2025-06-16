@@ -14,7 +14,6 @@ Future<void> main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  //await cart.loadCartItems();
   Bloc.observer = AppBlocObserver();
   runApp(const App());
 }
