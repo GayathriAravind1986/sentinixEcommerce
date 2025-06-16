@@ -7,8 +7,8 @@ import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/Reusable/image.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
 import 'package:sentinix_ecommerce/Reusable/space.dart';
-import 'package:sentinix_ecommerce/UI/UserApp/Landing/Profile/personal_info_section.dart';
-import 'package:sentinix_ecommerce/UI/UserApp/Landing/Profile/profile_section_tile.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Profile/Profile/personal_info_section.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Profile/Profile/profile_section_tile.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({
