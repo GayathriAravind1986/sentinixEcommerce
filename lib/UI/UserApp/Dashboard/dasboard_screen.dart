@@ -55,6 +55,7 @@ class DashboardScreenState extends State<DashboardScreen> {
         }
       },
       child: Scaffold(
+        extendBody: true,
         body: navigatorItems[currentIndex].screen,
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
@@ -64,7 +65,7 @@ class DashboardScreenState extends State<DashboardScreen> {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black38.withOpacity(0.1),
+                color: blackColor38.withOpacity(0.1),
                 spreadRadius: 0,
                 blurRadius: 37,
                 offset: const Offset(0, -12),

@@ -172,45 +172,29 @@ class _UserSignupViewState extends State<UserSignupView> {
       child: Scaffold(
         backgroundColor: whiteColor,
         appBar: PreferredSize(
-          preferredSize: size.width < 650
-              ? const Size.fromHeight(55)
-              : const Size.fromHeight(90),
+          preferredSize: const Size.fromHeight(55),
           child: AppBar(
             automaticallyImplyLeading: false,
-            flexibleSpace: Container(
-              width: double.infinity,
-              color: whiteColor,
-              padding: const EdgeInsets.only(top: 35, left: 20, right: 15),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  InkWell(
-                    onTap: () {
-                      Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(
-                            builder: (context) => const LoginCustomer()),
-                        (Route<dynamic> route) => false,
-                      );
-                    },
-                    child: Image.asset(
-                      alignment: Alignment.topCenter,
-                      Images.backArrow,
-                      width: size.width * 0.1,
-                      height: size.height * 0.05,
-                    ),
-                  ),
-                  horizontalSpace(width: 20),
-                  Text("SignUp",
-                      textAlign: TextAlign.start,
-                      style: size.width < 650
-                          ? MyTextStyle.f20(blackColor, weight: FontWeight.w600)
-                          : MyTextStyle.f30(blackColor,
-                              weight: FontWeight.w600)),
-                ],
-              ),
-            ),
             elevation: 0,
-            backgroundColor: whiteColor,
+            backgroundColor: appPrimaryColor,
+            title: Text("My Orders",
+                style: MyTextStyle.f20(whiteColor, weight: FontWeight.w600)),
+            centerTitle: true,
+            leading: InkWell(
+              onTap: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (context) => const LoginCustomer()),
+                  (Route<dynamic> route) => false,
+                );
+              },
+              child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Icon(
+                    Icons.arrow_back_ios_new_outlined,
+                    color: whiteColor,
+                  )),
+            ),
           ),
         ),
         body: BlocBuilder<DemoBloc, dynamic>(

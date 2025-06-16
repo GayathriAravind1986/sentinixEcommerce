@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:overlay_support/overlay_support.dart';
 import 'package:sentinix_ecommerce/Bloc/observer/observer.dart';
 import 'package:sentinix_ecommerce/Bloc/theme_cubit.dart';

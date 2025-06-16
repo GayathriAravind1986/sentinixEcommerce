@@ -7,6 +7,7 @@ import 'package:sentinix_ecommerce/Reusable/elevated_button.dart';
 import 'package:sentinix_ecommerce/Reusable/image.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Authentication/login.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Navigation_Bar/Navigation_bar.dart';
 
 class UserOTPVerify extends StatelessWidget {
   const UserOTPVerify({
@@ -94,11 +95,11 @@ class _UserOTPVerifyViewState extends State<UserOTPVerifyView> {
                   CustomButton(
                     text: "Verify OTP",
                     onPressed: () {
-                      // Navigator.of(context).pushAndRemoveUntil(
-                      //   MaterialPageRoute(
-                      //       builder: (context) => const LoginCustomer()),
-                      //   (Route<dynamic> route) => false,
-                      // );
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                            builder: (context) => const DashBoardScreen()),
+                        (Route<dynamic> route) => false,
+                      );
                     },
                   ),
                 ],

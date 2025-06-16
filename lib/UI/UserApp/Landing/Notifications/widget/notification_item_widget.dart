@@ -1,11 +1,13 @@
 class NotificationItem {
   final String title;
   final String message;
-  final DateTime timestamp;
+  final String serviceId;
+  final String dateTime;
 
   NotificationItem({
     required this.title,
     required this.message,
-    required this.timestamp,
+    required this.serviceId,
+    required this.dateTime,
   });
 }

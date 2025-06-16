@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'dart:async';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/Reusable/image.dart';
@@ -31,7 +29,12 @@ class _HomeScreenViewState extends State<HomeScreenView> {
   final PageController _carouselPageController = PageController(initialPage: 0);
   Timer? _carouselTimer;
   final String userName = 'Sri Ram';
-  final List<String> bannerImages = [Images.banner_1, Images.banner_2, Images.banner_3, Images.banner_4];
+  final List<String> bannerImages = [
+    Images.banner_1,
+    Images.banner_2,
+    Images.banner_3,
+    Images.banner_4
+  ];
 
   @override
   void initState() {
@@ -100,11 +103,13 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                 children: [
                   Text(
                     '$greeting,',
-                    style: MyTextStyle.f24(Colors.black, weight: FontWeight.w600),
+                    style:
+                        MyTextStyle.f24(Colors.black, weight: FontWeight.w600),
                   ),
                   Text(
                     userName,
-                    style: MyTextStyle.f24(Colors.black, weight: FontWeight.bold),
+                    style:
+                        MyTextStyle.f24(Colors.black, weight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -225,9 +230,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   Future<void> _onFetchHomeData(
-      FetchHomeData event,
-      Emitter<HomeState> emit,
-      ) async {
+    FetchHomeData event,
+    Emitter<HomeState> emit,
+  ) async {
     emit(HomeLoading());
     try {
       await Future.delayed(const Duration(seconds: 1));
@@ -239,12 +244,17 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 }
 
 abstract class HomeEvent {}
+
 class FetchHomeData extends HomeEvent {}
 
 abstract class HomeState {}
+
 class HomeInitial extends HomeState {}
+
 class HomeLoading extends HomeState {}
+
 class HomeLoaded extends HomeState {}
+
 class HomeError extends HomeState {
   final String message;
   HomeError(this.message);
