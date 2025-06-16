@@ -22,6 +22,7 @@ class Images {
   static const String banner_4 = 'assets/image/banner_4.jpg';
   static const String parcel = 'assets/image/parcel.png';
   static const String person = 'assets/image/person.png';
+  static const String person = 'assets/image/profile.png';
 
 
 
