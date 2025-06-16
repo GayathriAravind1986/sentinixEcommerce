@@ -76,7 +76,7 @@ import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Home_screen.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Notifications/notification.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/OrderScreen/order_screen.dart';
-import 'package:sentinix_ecommerce/UI/UserApp/Landing/Profile/profile_screen.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Profile/Profile/profile_screen.dart';
 
 class DashBoardScreen extends StatefulWidget {
   const DashBoardScreen({super.key});
