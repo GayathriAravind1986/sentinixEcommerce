@@ -36,21 +36,21 @@ class _MyOrderScreenViewState extends State<MyOrderScreenView> {
   final List<Map<String, String>> orders = const [
     {
       'type': 'Parcel PickupAndDrop',
-      'orderNumber': 'LP13946',
+      'orderNumber': 'PD13946',
       'date': 'Jun 14, 2025, 1:14PM',
       'amount': '40.40',
       'status': 'pending',
     },
     {
       'type': 'Parcel PickupAndDrop',
-      'orderNumber': 'LP13947',
+      'orderNumber': 'PD13947',
       'date': 'Jun 15, 2025, 2:30PM',
       'amount': '60.00',
       'status': 'onGoing',
     },
     {
       'type': 'Person PickupAndDrop',
-      'orderNumber': 'LP13948',
+      'orderNumber': 'PD13948',
       'date': 'Jun 16, 2025, 4:30PM',
       'amount': '80.00',
       'status': 'Cancelled',

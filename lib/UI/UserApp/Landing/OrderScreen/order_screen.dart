@@ -53,19 +53,28 @@ class _OrderScreenViewState extends State<OrderScreenView> {
   bool orderLoad = true;
   final List<CurrentOrder> orders = [
     CurrentOrder(
-      serviceId: 'LP13946',
+      serviceId: 'PD13946',
       date: 'Jun 14, 2025',
       time: '1:14 PM',
-      status: 'pending',
+      status: 'Pending',
       dropAddress:
           '224, 6, Thiruvalluvar Salai,\nKuyavarpalayam, Puducherry India 605013',
       phoneNumber: '+91 9655334412',
     ),
     CurrentOrder(
-      serviceId: 'LP13946',
+      serviceId: 'PD13947',
       date: 'Jun 15, 2025',
       time: '2:14 PM',
-      status: 'cancelled',
+      status: 'Cancelled',
+      dropAddress:
+          '224, 6, Thiruvalluvar Salai,\nKuyavarpalayam, Puducherry India 605013',
+      phoneNumber: '+91 9655334412',
+    ),
+    CurrentOrder(
+      serviceId: 'PD13948',
+      date: 'Jun 16, 2025',
+      time: '10:14 AM',
+      status: 'onGoing',
       dropAddress:
           '224, 6, Thiruvalluvar Salai,\nKuyavarpalayam, Puducherry India 605013',
       phoneNumber: '+91 9655334412',
@@ -90,9 +99,9 @@ class _OrderScreenViewState extends State<OrderScreenView> {
             padding: const EdgeInsets.all(16),
             margin: const EdgeInsets.only(bottom: 20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: whiteColor,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade300),
+              border: Border.all(color: appSecondaryColor),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,47 +109,75 @@ class _OrderScreenViewState extends State<OrderScreenView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Pickup And Drop',
-                      style: TextStyle(
-                        color: Colors.orange,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      'Status : ${order.status}',
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Text('Pickup And Drop',
+                        style: MyTextStyle.f15(orangeColor,
+                            weight: FontWeight.bold)),
+                    Row(
+                      children: [
+                        Text('Status : ',
+                            style: MyTextStyle.f15(blackColor,
+                                weight: FontWeight.bold)),
+                        Text(order.status,
+                            style: MyTextStyle.f13(
+                                order.status == "Pending"
+                                    ? orangeColor
+                                    : order.status == "Cancelled"
+                                        ? redColor
+                                        : greenColor,
+                                weight: FontWeight.bold)),
+                      ],
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
-                Text('ServiceId : ${order.serviceId}'),
-                const SizedBox(height: 6),
-                Text('Date : ${order.date}'),
-                const SizedBox(height: 6),
-                Text('Requested On : ${order.time}'),
-                const SizedBox(height: 12),
-                const Text(
-                  'Drop Address :',
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  children: [
+                    Text('ServiceId : ',
+                        style: MyTextStyle.f15(blackColor,
+                            weight: FontWeight.bold)),
+                    Text(order.serviceId,
+                        style: MyTextStyle.f13(blackColor,
+                            weight: FontWeight.w400)),
+                  ],
                 ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Text('Date : ',
+                        style: MyTextStyle.f15(blackColor,
+                            weight: FontWeight.bold)),
+                    Text(order.date,
+                        style: MyTextStyle.f13(blackColor,
+                            weight: FontWeight.w400)),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Text('Requested On : ',
+                        style: MyTextStyle.f15(blackColor,
+                            weight: FontWeight.bold)),
+                    Text(order.time,
+                        style: MyTextStyle.f13(blackColor,
+                            weight: FontWeight.w400)),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text('Drop Address :',
+                    style: MyTextStyle.f15(appSecondaryColor,
+                        weight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Icon(Icons.location_city,
-                        color: Colors.orange, size: 20),
+                        color: orangeColor, size: 20),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
                         order.dropAddress,
-                        style: const TextStyle(fontSize: 14),
+                        style: MyTextStyle.f14(appSecondaryColor,
+                            weight: FontWeight.w400),
                       ),
                     ),
                   ],
@@ -149,15 +186,14 @@ class _OrderScreenViewState extends State<OrderScreenView> {
                 RichText(
                   text: TextSpan(
                     text: 'Help line: ',
-                    style: const TextStyle(color: Colors.black),
+                    style: MyTextStyle.f15(blackColor, weight: FontWeight.bold),
                     children: [
                       TextSpan(
-                        text: order.phoneNumber,
-                        style: const TextStyle(
-                          color: Colors.blue,
-                          decoration: TextDecoration.underline,
-                        ),
-                      )
+                          text: order.phoneNumber,
+                          style: MyTextStyle.f13(appSecondaryColor,
+                              weight: FontWeight.w400,
+                              textDecoration: TextDecoration.underline,
+                              decorationColor: appSecondaryColor))
                     ],
                   ),
                 )

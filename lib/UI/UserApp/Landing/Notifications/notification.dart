@@ -40,7 +40,19 @@ class _NotificationScreenViewState extends State<NotificationScreenView> {
     NotificationItem(
       title: 'PRO DELIVERZ',
       message: 'Your Service has been Completed.\nThank you for choosing us',
-      serviceId: 'LPI3946',
+      serviceId: 'PDI3946',
+      dateTime: 'Jun 14, 2025  2:07 PM',
+    ),
+    NotificationItem(
+      title: 'PRO DELIVERZ',
+      message: 'Your Service has been Completed.\nThank you for choosing us',
+      serviceId: 'PDI3946',
+      dateTime: 'Jun 14, 2025  2:07 PM',
+    ),
+    NotificationItem(
+      title: 'PRO DELIVERZ',
+      message: 'Your Service has been Completed.\nThank you for choosing us',
+      serviceId: 'PDI3946',
       dateTime: 'Jun 14, 2025  2:07 PM',
     ),
     NotificationItem(
@@ -52,25 +64,13 @@ class _NotificationScreenViewState extends State<NotificationScreenView> {
     NotificationItem(
       title: 'PRO DELIVERZ',
       message: 'Your Service has been Completed.\nThank you for choosing us',
-      serviceId: 'LPI3946',
+      serviceId: 'PDI3946',
       dateTime: 'Jun 14, 2025  2:07 PM',
     ),
     NotificationItem(
       title: 'PRO DELIVERZ',
       message: 'Your Service has been Completed.\nThank you for choosing us',
-      serviceId: 'LPI3946',
-      dateTime: 'Jun 14, 2025  2:07 PM',
-    ),
-    NotificationItem(
-      title: 'PRO DELIVERZ',
-      message: 'Your Service has been Completed.\nThank you for choosing us',
-      serviceId: 'LPI3946',
-      dateTime: 'Jun 14, 2025  2:07 PM',
-    ),
-    NotificationItem(
-      title: 'PRO DELIVERZ',
-      message: 'Your Service has been Completed.\nThank you for choosing us',
-      serviceId: 'LPI3946',
+      serviceId: 'PDI3946',
       dateTime: 'Jun 14, 2025  2:07 PM',
     ),
   ];
@@ -116,7 +116,7 @@ class _NotificationScreenViewState extends State<NotificationScreenView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(item.title,
-                          style: MyTextStyle.f16(appSecondaryColor,
+                          style: MyTextStyle.f16(orangeColor,
                               weight: FontWeight.bold)),
                       const SizedBox(height: 6),
                       Text(item.message,

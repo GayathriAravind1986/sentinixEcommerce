@@ -264,6 +264,8 @@ class MyTextStyle {
     Color color, {
     FontWeight? weight,
     FontStyle? fontStyle,
+    Color? decorationColor,
+    TextDecoration? textDecoration,
   }) {
     return TextStyle(
       fontFamily: "Montserrat",
@@ -271,6 +273,8 @@ class MyTextStyle {
       fontSize: 13,
       fontStyle: fontStyle ?? FontStyle.normal,
       fontWeight: weight ?? FontWeight.w500,
+      decoration: textDecoration,
+      decorationColor: decorationColor,
     );
   }
 
