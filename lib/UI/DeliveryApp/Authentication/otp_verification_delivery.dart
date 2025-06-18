@@ -55,8 +55,8 @@ class _DeliveryOTPVerifyViewState extends State<DeliveryOTPVerifyView> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Image.asset(
-                    Images.loginImage,
-                    height: 200,
+                    Images.splashLogo,
+                    height: size.height * 0.25,
                   ),
                   const SizedBox(height: 30),
                   Text(

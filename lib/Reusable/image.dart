@@ -11,7 +11,8 @@ class Images {
   static const String profileIcon = 'assets/icon/profile_icon.png';
 
   // --- Images (PNG/JPG) ---
-  static const String logo = 'assets/image/sentinix_logo.png';
+  static const String logo = 'assets/image/pro_deliverz.png';
+  static const String splashLogo = 'assets/image/splash_icon.png';
   static const String loginImage = 'assets/image/login_Image.png';
   static const String backArrow = "assets/image/backarrow.png";
 
@@ -20,7 +21,7 @@ class Images {
   static const String banner_2 = 'assets/image/banner_2.jpg';
   static const String banner_3 = 'assets/image/banner_3.jpg';
   static const String banner_4 = 'assets/image/banner_4.jpg';
-  static const String parcel = 'assets/image/parcel.png';
+  static const String parcel = 'assets/image/parcel_pickup.png';
   static const String person = 'assets/image/person.png';
   static const String profile = 'assets/image/profile.png';
 }

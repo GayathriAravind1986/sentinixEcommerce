@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sentinix_ecommerce/Bloc/demo/demo_bloc.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/parcel_pickup_drop.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/widget/home_card_widget.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'dart:async';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
@@ -12,7 +15,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => HomeBloc(),
+      create: (_) => DemoBloc(),
       child: const HomeScreenView(),
     );
   }
@@ -40,7 +43,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
   void initState() {
     super.initState();
     _startCarouselTimer();
-    context.read<HomeBloc>().add(FetchHomeData());
+    //context.read<HomeBloc>().add(FetchHomeData());
   }
 
   void _startCarouselTimer() {
@@ -73,21 +76,6 @@ class _HomeScreenViewState extends State<HomeScreenView> {
     return 'Good Evening';
   }
 
-  Widget mainContainer() {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(),
-          const SizedBox(height: 20),
-          _buildCarousel(),
-          const SizedBox(height: 30),
-          _buildServiceCards(),
-        ],
-      ),
-    );
-  }
-
   Widget _buildHeader() {
     final greeting = getGreeting();
     return Padding(
@@ -104,12 +92,12 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                   Text(
                     '$greeting,',
                     style:
-                        MyTextStyle.f24(Colors.black, weight: FontWeight.w600),
+                        MyTextStyle.f20(Colors.black, weight: FontWeight.w600),
                   ),
                   Text(
                     userName,
                     style:
-                        MyTextStyle.f24(Colors.black, weight: FontWeight.bold),
+                        MyTextStyle.f18(Colors.black, weight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -123,7 +111,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
           const SizedBox(height: 8),
           Text(
             'Ready to send something today?',
-            style: MyTextStyle.f17(Colors.black54),
+            style: MyTextStyle.f14(Colors.black54),
           ),
         ],
       ),
@@ -140,15 +128,16 @@ class _HomeScreenViewState extends State<HomeScreenView> {
             itemCount: bannerImages.length,
             itemBuilder: (context, index) {
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30.0, vertical: 2),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: Image.asset(
                     bannerImages[index],
                     width: double.infinity,
-                    fit: BoxFit.cover,
+                    fit: BoxFit.fill,
                     errorBuilder: (context, error, stackTrace) => Container(
-                      color: Colors.grey[200],
+                      color: greyShade300,
                       child: const Icon(Icons.broken_image),
                     ),
                   ),
@@ -176,17 +165,23 @@ class _HomeScreenViewState extends State<HomeScreenView> {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         children: [
-          ServiceCard(
-            title: 'Parcel\nPickup & Drop',
-            icon: Icons.local_shipping,
-            image: Images.parcel,
-            iconColor: appSecondaryColor,
-            imageBackground: appPrimaryColor,
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const PickupDropScreen()),
+              );
+            },
+            child: ServiceCard(
+              title: 'Parcel Pickup & Drop',
+              image: Images.parcel,
+              iconColor: appPrimaryColor,
+              imageBackground: appSecondaryColor,
+            ),
           ),
           const SizedBox(height: 16),
           ServiceCard(
-            title: 'Person\nPickup & Drop',
-            icon: Icons.person,
+            title: 'Person Pickup & Drop',
             image: Images.person,
             iconColor: appPrimaryColor,
             imageBackground: appSecondaryColor,
@@ -198,142 +193,33 @@ class _HomeScreenViewState extends State<HomeScreenView> {
 
   @override
   Widget build(BuildContext context) {
+    Widget mainContainer() {
+      return SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(),
+            const SizedBox(height: 10),
+            _buildCarousel(),
+            const SizedBox(height: 30),
+            _buildServiceCards(),
+          ],
+        ),
+      );
+    }
+
     return WillPopScope(
       onWillPop: () async => true,
       child: Scaffold(
         backgroundColor: whiteColor,
-        body: BlocBuilder<HomeBloc, HomeState>(
+        body: BlocBuilder<DemoBloc, dynamic>(
           buildWhen: (previous, current) {
-            if (current is HomeLoaded || current is HomeError) {
-              return true;
-            }
             return false;
           },
-          builder: (context, state) {
-            if (state is HomeLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (state is HomeError) {
-              return Center(child: Text(state.message));
-            }
+          builder: (context, dynamic) {
             return mainContainer();
           },
         ),
-      ),
-    );
-  }
-}
-
-class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  HomeBloc() : super(HomeInitial()) {
-    on<FetchHomeData>(_onFetchHomeData);
-  }
-
-  Future<void> _onFetchHomeData(
-    FetchHomeData event,
-    Emitter<HomeState> emit,
-  ) async {
-    emit(HomeLoading());
-    try {
-      await Future.delayed(const Duration(seconds: 1));
-      emit(HomeLoaded());
-    } catch (e) {
-      emit(HomeError(e.toString()));
-    }
-  }
-}
-
-abstract class HomeEvent {}
-
-class FetchHomeData extends HomeEvent {}
-
-abstract class HomeState {}
-
-class HomeInitial extends HomeState {}
-
-class HomeLoading extends HomeState {}
-
-class HomeLoaded extends HomeState {}
-
-class HomeError extends HomeState {
-  final String message;
-  HomeError(this.message);
-}
-
-class ServiceCard extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final String image;
-  final Color iconColor;
-  final Color imageBackground;
-
-  const ServiceCard({
-    super.key,
-    required this.title,
-    required this.icon,
-    required this.image,
-    required this.iconColor,
-    required this.imageBackground,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 110,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: whiteColor,
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 3,
-            child: Container(
-              decoration: BoxDecoration(
-                color: iconColor,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  bottomLeft: Radius.circular(20),
-                ),
-              ),
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(icon, color: whiteColor, size: 30),
-                  const SizedBox(height: 10),
-                  Text(
-                    title,
-                    style: MyTextStyle.f14(whiteColor, weight: FontWeight.bold),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topRight: Radius.circular(20),
-                bottomRight: Radius.circular(20),
-              ),
-              child: Container(
-                color: imageBackground,
-                child: Image.asset(
-                  image,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: double.infinity,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    color: Colors.grey[200],
-                    child: const Icon(Icons.broken_image),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

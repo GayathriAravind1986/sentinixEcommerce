@@ -177,7 +177,7 @@ class _UserSignupViewState extends State<UserSignupView> {
             automaticallyImplyLeading: false,
             elevation: 0,
             backgroundColor: appPrimaryColor,
-            title: Text("My Orders",
+            title: Text("Sign up",
                 style: MyTextStyle.f20(whiteColor, weight: FontWeight.w600)),
             centerTitle: true,
             leading: InkWell(

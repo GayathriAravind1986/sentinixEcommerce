@@ -66,10 +66,12 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.blueGrey[50],
+        backgroundColor: whiteColor,
         body: _pages[_selectedIndex],
         bottomNavigationBar: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 10.0,
+          ),
           child: Container(
             height: 70,
             decoration: BoxDecoration(
@@ -94,8 +96,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                     width: 50,
                     height: 50,
                     decoration: BoxDecoration(
-                      color:
-                          isSelected ? appSecondaryColor : Colors.transparent,
+                      color: isSelected ? accentColor : Colors.transparent,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(

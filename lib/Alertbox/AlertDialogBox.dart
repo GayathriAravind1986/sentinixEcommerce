@@ -49,12 +49,12 @@ showLogoutDialog(BuildContext context) {
                   ? const TextStyle(
                       fontWeight: FontWeight.w400,
                       fontSize: 16,
-                      color: appGreyTextColor,
+                      color: greyColor,
                     )
                   : const TextStyle(
                       fontWeight: FontWeight.w400,
                       fontSize: 20,
-                      color: appGreyTextColor,
+                      color: greyColor,
                     ),
             ),
             actionsPadding: const EdgeInsets.all(20),
@@ -63,12 +63,12 @@ showLogoutDialog(BuildContext context) {
                 child: Text("NOT NOW",
                     style: MediaQuery.of(context).size.width < 650
                         ? const TextStyle(
-                            color: appGreyTextColor,
+                            color: greyColor,
                             fontSize: 14,
                             fontWeight: FontWeight.w400,
                           )
                         : const TextStyle(
-                            color: appGreyTextColor,
+                            color: greyColor,
                             fontSize: 18,
                             fontWeight: FontWeight.w400,
                           )),

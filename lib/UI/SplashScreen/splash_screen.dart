@@ -73,12 +73,14 @@ class _SplashScreenState extends State<SplashScreen>
                 child: AnimatedBuilder(
               animation: _controller,
               child: Container(
-                width: 10,
-                height: 10,
+                // width: 10,
+                // height: 10,
                 color: Colors.transparent,
                 child: Center(
                   child: Image.asset(
-                    Images.logo,
+                    height: 50,
+                    width: 50,
+                    Images.splashLogo,
                     fit: BoxFit.contain,
                   ),
                 ),

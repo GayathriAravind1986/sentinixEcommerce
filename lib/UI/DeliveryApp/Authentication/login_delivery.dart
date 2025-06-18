@@ -60,8 +60,8 @@ class _LoginDeliveryManViewState extends State<LoginDeliveryManView> {
               children: [
                 Center(
                   child: Image.asset(
-                    Images.loginImage,
-                    height: size.height * 0.3,
+                    Images.splashLogo,
+                    height: size.height * 0.25,
                   ),
                 ),
                 const SizedBox(height: 20),
