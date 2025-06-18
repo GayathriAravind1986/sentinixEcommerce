@@ -24,8 +24,8 @@ class _AnimatedLoginDeliveryState extends State<AnimatedLoginDelivery> {
           borderRadius: BorderRadius.circular(12),
           gradient: const LinearGradient(
             colors: [
-              Color(0xFF00707E),
-              Color(0xFF00A8A3),
+              Color(0xFFF57C00),
+              Color(0xFFBF360C),
             ],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,

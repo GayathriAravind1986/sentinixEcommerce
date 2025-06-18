@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 
 /// Application Colors
-//const Color appPrimaryColor = Color(0xFF164B9A);
-const Color appPrimaryColor = Color(0xFF1DE9B6);
+const Color appPrimaryColor = Color(0xFFF57C00);
 const Color appSecondaryColor = Color(0xFF006064);
+const Color accentColor = Color(0xFFFFC107);
+const Color backgroundColor = Color(0xFFFAFAFA);
+const Color textColorDark = Color(0xFF212121);
+const Color textColorLight = Color(0xFFFFFFFF);
 const Color appBlueColor = Color(0xFF648DDB);
 const Color appGreyColor = Color(0xFFE1E1E1);
 const Color appLightBlueColor = Color(0XFFf0f3f5);
-const Color appGreyTextColor = Color(0xFF989898);
-const Color appHomeTextColor = Color(0xFF164B9A);
 const Color appDividerColor = Color(0xFFCECECE);
 const Color appNotificationColor = Color(0xFFD9EFF2);
 const Color appGreenColor = Color(0xFF147338);

@@ -86,18 +86,19 @@ class _NotificationScreenViewState extends State<NotificationScreenView> {
     Widget mainContainer() {
       return Stack(
         children: [
-          Positioned.fill(
-            child: Image.asset(
-              Images.loginImage,
-              fit: BoxFit.cover,
-            ),
-          ),
-          Positioned.fill(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 2.0, sigmaY: 2.0),
-              child: Container(color: appPrimaryColor.withOpacity(0.3)),
-            ),
-          ),
+          // Positioned.fill(
+          //   child: Image.asset(
+
+          //     Images.splashLogo,
+          //     fit: BoxFit.cover,
+          //   ),
+          // ),
+          // Positioned.fill(
+          //   child: BackdropFilter(
+          //     filter: ImageFilter.blur(sigmaX: 2.0, sigmaY: 2.0),
+          //     child: Container(color: appPrimaryColor.withOpacity(0.3)),
+          //   ),
+          // ),
           SizedBox(
             height: size.height * 0.8,
             child: ListView.builder(
@@ -155,6 +156,7 @@ class _NotificationScreenViewState extends State<NotificationScreenView> {
       child: Scaffold(
         backgroundColor: whiteColor,
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: appPrimaryColor,
           elevation: 0,
           centerTitle: true,

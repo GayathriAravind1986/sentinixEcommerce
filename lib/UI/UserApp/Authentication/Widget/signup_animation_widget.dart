@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
 import 'package:sentinix_ecommerce/UI/DeliveryApp/Authentication/login_delivery.dart';
-
-import 'package:sentinix_ecommerce/UI/UserApp/Authentication/login.dart';
-
 import 'package:slide_to_act/slide_to_act.dart';
 
 class AnimatedLoginLink extends StatefulWidget {
@@ -17,8 +14,6 @@ class AnimatedLoginLink extends StatefulWidget {
 class _AnimatedLoginLinkState extends State<AnimatedLoginLink> {
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Container(
@@ -27,8 +22,8 @@ class _AnimatedLoginLinkState extends State<AnimatedLoginLink> {
           borderRadius: BorderRadius.circular(12),
           gradient: const LinearGradient(
             colors: [
-              Color(0xFF00707E),
-              Color(0xFF00A8A3),
+              Color(0xFFF57C00),
+              Color(0xFFBF360C),
             ],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
