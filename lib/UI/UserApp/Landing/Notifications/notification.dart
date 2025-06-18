@@ -7,6 +7,7 @@ import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/Reusable/image.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Notifications/widget/notification_item_widget.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Navigation_Bar/Navigation_bar.dart';
 
 class NotificationScreen extends StatelessWidget {
   const NotificationScreen({
@@ -144,10 +145,11 @@ class _NotificationScreenViewState extends State<NotificationScreenView> {
       canPop: false,
       onPopInvoked: (didPop) {
         if (!didPop) {
-          // Navigator.of(context).pushAndRemoveUntil(
-          //   MaterialPageRoute(builder: (context) => const LoginDeliveryMan()),
-          //   (route) => false,
-          // );
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const DashBoardScreen()),
+            (route) => false, // Clear all routes
+          );
         }
       },
       child: Scaffold(

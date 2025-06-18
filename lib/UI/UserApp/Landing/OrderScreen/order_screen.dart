@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sentinix_ecommerce/Bloc/demo/demo_bloc.dart';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/OrderScreen/current_order_details.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Profile/MyOrders/my_order_details.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Navigation_Bar/Navigation_bar.dart';
 
 class OrderScreen extends StatelessWidget {
   const OrderScreen({
@@ -90,117 +92,126 @@ class _OrderScreenViewState extends State<OrderScreenView> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     Widget mainContainer() {
-      return ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: orders.length,
-        itemBuilder: (context, index) {
-          final order = orders[index];
-          return Container(
-            padding: const EdgeInsets.all(16),
-            margin: const EdgeInsets.only(bottom: 20),
-            decoration: BoxDecoration(
-              color: whiteColor,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: appSecondaryColor),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Pickup And Drop',
-                        style: MyTextStyle.f15(orangeColor,
-                            weight: FontWeight.bold)),
-                    Row(
-                      children: [
-                        Text('Status : ',
-                            style: MyTextStyle.f15(blackColor,
-                                weight: FontWeight.bold)),
-                        Text(order.status,
-                            style: MyTextStyle.f13(
-                                order.status == "Pending"
-                                    ? orangeColor
-                                    : order.status == "Cancelled"
-                                        ? redColor
-                                        : greenColor,
-                                weight: FontWeight.bold)),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Text('ServiceId : ',
-                        style: MyTextStyle.f15(blackColor,
-                            weight: FontWeight.bold)),
-                    Text(order.serviceId,
-                        style: MyTextStyle.f13(blackColor,
-                            weight: FontWeight.w400)),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    Text('Date : ',
-                        style: MyTextStyle.f15(blackColor,
-                            weight: FontWeight.bold)),
-                    Text(order.date,
-                        style: MyTextStyle.f13(blackColor,
-                            weight: FontWeight.w400)),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    Text('Requested On : ',
-                        style: MyTextStyle.f15(blackColor,
-                            weight: FontWeight.bold)),
-                    Text(order.time,
-                        style: MyTextStyle.f13(blackColor,
-                            weight: FontWeight.w400)),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Text('Drop Address :',
-                    style: MyTextStyle.f15(appSecondaryColor,
-                        weight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Icon(Icons.location_city,
-                        color: orangeColor, size: 20),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        order.dropAddress,
-                        style: MyTextStyle.f14(appSecondaryColor,
-                            weight: FontWeight.w400),
-                      ),
-                    ),
-                  ],
-                ),
-                const Divider(height: 20),
-                RichText(
-                  text: TextSpan(
-                    text: 'Help line: ',
-                    style: MyTextStyle.f15(blackColor, weight: FontWeight.bold),
-                    children: [
-                      TextSpan(
-                          text: order.phoneNumber,
-                          style: MyTextStyle.f13(appSecondaryColor,
-                              weight: FontWeight.w400,
-                              textDecoration: TextDecoration.underline,
-                              decorationColor: appSecondaryColor))
-                    ],
-                  ),
-                )
-              ],
-            ),
+      return InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const CurrentOrderStatus()),
           );
         },
+        child: ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: orders.length,
+          itemBuilder: (context, index) {
+            final order = orders[index];
+            return Container(
+              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.only(bottom: 20),
+              decoration: BoxDecoration(
+                color: whiteColor,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: appSecondaryColor),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Pickup And Drop',
+                          style: MyTextStyle.f15(orangeColor,
+                              weight: FontWeight.bold)),
+                      Row(
+                        children: [
+                          Text('Status : ',
+                              style: MyTextStyle.f15(blackColor,
+                                  weight: FontWeight.bold)),
+                          Text(order.status,
+                              style: MyTextStyle.f13(
+                                  order.status == "Pending"
+                                      ? orangeColor
+                                      : order.status == "Cancelled"
+                                          ? redColor
+                                          : greenColor,
+                                  weight: FontWeight.bold)),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Text('ServiceId : ',
+                          style: MyTextStyle.f15(blackColor,
+                              weight: FontWeight.bold)),
+                      Text(order.serviceId,
+                          style: MyTextStyle.f13(blackColor,
+                              weight: FontWeight.w400)),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Text('Date : ',
+                          style: MyTextStyle.f15(blackColor,
+                              weight: FontWeight.bold)),
+                      Text(order.date,
+                          style: MyTextStyle.f13(blackColor,
+                              weight: FontWeight.w400)),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Text('Requested On : ',
+                          style: MyTextStyle.f15(blackColor,
+                              weight: FontWeight.bold)),
+                      Text(order.time,
+                          style: MyTextStyle.f13(blackColor,
+                              weight: FontWeight.w400)),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text('Drop Address :',
+                      style: MyTextStyle.f15(appSecondaryColor,
+                          weight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.location_city,
+                          color: orangeColor, size: 20),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          order.dropAddress,
+                          style: MyTextStyle.f14(appSecondaryColor,
+                              weight: FontWeight.w400),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Divider(height: 20),
+                  RichText(
+                    text: TextSpan(
+                      text: 'Help line: ',
+                      style:
+                          MyTextStyle.f15(blackColor, weight: FontWeight.bold),
+                      children: [
+                        TextSpan(
+                            text: order.phoneNumber,
+                            style: MyTextStyle.f13(appSecondaryColor,
+                                weight: FontWeight.w400,
+                                textDecoration: TextDecoration.underline,
+                                decorationColor: appSecondaryColor))
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            );
+          },
+        ),
       );
     }
 
@@ -208,10 +219,11 @@ class _OrderScreenViewState extends State<OrderScreenView> {
       canPop: false,
       onPopInvoked: (didPop) {
         if (!didPop) {
-          // Navigator.of(context).pushAndRemoveUntil(
-          //   MaterialPageRoute(builder: (context) => const LoginDeliveryMan()),
-          //   (route) => false,
-          // );
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const DashBoardScreen()),
+            (route) => false, // Clear all routes
+          );
         }
       },
       child: Scaffold(

@@ -9,6 +9,7 @@ import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
 import 'package:sentinix_ecommerce/Reusable/space.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Profile/Profile/personal_info_section.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Profile/Profile/profile_section_tile.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Navigation_Bar/Navigation_bar.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({
@@ -120,112 +121,120 @@ class _ProfileScreenViewState extends State<ProfileScreenView> {
 
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
     Widget mainContainer() {
-      return Scaffold(
-        backgroundColor: appPrimaryColor,
-        body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.person_outline, color: appSecondaryColor),
-                    horizontalSpace(width: 8),
-                    Text(
-                      'Profile',
-                      style: MyTextStyle.f26(appSecondaryColor),
-                    ),
-                  ],
-                ),
-                verticalSpace(height: 10),
-                Text(
-                  'Welcome, $username',
-                  style: MyTextStyle.f16(appSecondaryColor),
-                ),
-                verticalSpace(height: 20),
-                Stack(
-                  alignment: Alignment.bottomRight,
-                  children: [
-                    CircleAvatar(
-                      radius: 55,
-                      backgroundImage: _image != null
-                          ? FileImage(_image!)
-                          : AssetImage(Images.profileIcon) as ImageProvider,
-                    ),
-                    CircleAvatar(
-                      radius: 18,
-                      backgroundColor: appPrimaryColor,
-                      child: IconButton(
-                        icon: const Icon(Icons.edit,
-                            size: 18, color: appSecondaryColor),
-                        onPressed: _pickImage,
-                      ),
-                    ),
-                  ],
-                ),
-                verticalSpace(height: 24),
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                  child: ProfileSectionTile(
-                    title: 'Personal Information',
-                    icon: Icons.info_outline,
-                    child: const PersonalInfoSection(),
+      return SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.person_outline, color: appSecondaryColor),
+                  horizontalSpace(width: 8),
+                  Text(
+                    'Profile',
+                    style: MyTextStyle.f26(appSecondaryColor),
                   ),
+                ],
+              ),
+              verticalSpace(height: 10),
+              Text(
+                'Welcome, $username',
+                style: MyTextStyle.f16(appSecondaryColor),
+              ),
+              verticalSpace(height: 20),
+              Stack(
+                alignment: Alignment.bottomRight,
+                children: [
+                  CircleAvatar(
+                    radius: 55,
+                    backgroundImage: _image != null
+                        ? FileImage(_image!)
+                        : AssetImage(Images.profileIcon) as ImageProvider,
+                  ),
+                  CircleAvatar(
+                    radius: 18,
+                    backgroundColor: appPrimaryColor,
+                    child: IconButton(
+                      icon: const Icon(Icons.edit,
+                          size: 18, color: appSecondaryColor),
+                      onPressed: _pickImage,
+                    ),
+                  ),
+                ],
+              ),
+              verticalSpace(height: 24),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                child: ProfileSectionTile(
+                  title: 'Personal Information',
+                  icon: Icons.info_outline,
+                  child: const PersonalInfoSection(),
                 ),
-                verticalSpace(height: 16),
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                  child: ProfileSectionTile(
-                    title: 'Delete Account',
+              ),
+              verticalSpace(height: 16),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                child: ProfileSectionTile(
+                  title: 'Delete Account',
+                  icon: Icons.delete_outline,
+                  child: _buildConfirmationCard(
+                    text:
+                        'Are you sure you want to delete your account permanently?',
+                    confirmText: 'Delete',
                     icon: Icons.delete_outline,
-                    child: _buildConfirmationCard(
-                      text:
-                          'Are you sure you want to delete your account permanently?',
-                      confirmText: 'Delete',
-                      icon: Icons.delete_outline,
-                      onConfirm: () {},
-                      onCancel: () {},
-                    ),
+                    onConfirm: () {},
+                    onCancel: () {},
                   ),
                 ),
-                verticalSpace(height: 16),
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                  child: ProfileSectionTile(
-                    title: 'Logout',
+              ),
+              verticalSpace(height: 16),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                child: ProfileSectionTile(
+                  title: 'Logout',
+                  icon: Icons.logout,
+                  child: _buildConfirmationCard(
+                    text: 'Do you want to logout from your account?',
+                    confirmText: 'Logout',
                     icon: Icons.logout,
-                    child: _buildConfirmationCard(
-                      text: 'Do you want to logout from your account?',
-                      confirmText: 'Logout',
-                      icon: Icons.logout,
-                      onConfirm: () {},
-                      onCancel: () {},
-                    ),
+                    onConfirm: () {},
+                    onCancel: () {},
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       );
     }
 
-    return Scaffold(
-      backgroundColor: whiteColor,
-      body: BlocBuilder<DemoBloc, dynamic>(
-        buildWhen: (previous, current) {
-          return false;
-        },
-        builder: (context, dynamic) {
-          return mainContainer();
-        },
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {
+        if (!didPop) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const DashBoardScreen()),
+            (route) => false, // Clear all routes
+          );
+        }
+      },
+      child: Scaffold(
+        backgroundColor: whiteColor,
+        body: BlocBuilder<DemoBloc, dynamic>(
+          buildWhen: (previous, current) {
+            return false;
+          },
+          builder: (context, dynamic) {
+            return mainContainer();
+          },
+        ),
       ),
     );
   }
