@@ -9,7 +9,7 @@ Future<bool> showExitConfirmationDialog(BuildContext context, Size size) async {
     builder: (context) => AlertDialog(
       title: Text(
         "Please confirm",
-        style: MyTextStyle.f15(appPrimaryColor, weight: FontWeight.bold),
+        style: MyTextStyle.f16(appPrimaryColor, weight: FontWeight.bold),
       ),
       content: Text(
         "Are you sure you want to exit?",

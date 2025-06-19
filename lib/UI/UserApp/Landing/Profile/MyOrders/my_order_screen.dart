@@ -4,6 +4,7 @@ import 'package:sentinix_ecommerce/Bloc/demo/demo_bloc.dart';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Profile/MyOrders/my_order_details.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Navigation_Bar/Navigation_bar.dart';
 
 class MyOrderScreen extends StatelessWidget {
   const MyOrderScreen({
@@ -154,10 +155,14 @@ class _MyOrderScreenViewState extends State<MyOrderScreenView> {
       canPop: false,
       onPopInvoked: (didPop) {
         if (!didPop) {
-          // Navigator.of(context).pushAndRemoveUntil(
-          //   MaterialPageRoute(builder: (context) => const LoginDeliveryMan()),
-          //   (route) => false,
-          // );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DashBoardScreen(
+                selectTab: 3,
+              ),
+            ),
+          );
         }
       },
       child: Scaffold(
@@ -173,7 +178,14 @@ class _MyOrderScreenViewState extends State<MyOrderScreenView> {
             centerTitle: true,
             leading: InkWell(
               onTap: () {
-                // Navigator.of(context).pushAndRemoveUntil(...);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DashBoardScreen(
+                      selectTab: 3,
+                    ),
+                  ),
+                );
               },
               child: Padding(
                   padding: const EdgeInsets.all(8.0),

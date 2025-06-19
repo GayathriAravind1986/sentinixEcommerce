@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sentinix_ecommerce/Bloc/demo/demo_bloc.dart';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
-import 'package:sentinix_ecommerce/Reusable/elevated_button.dart';
+import 'package:sentinix_ecommerce/Reusable/image.dart';
+import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Profile/MyOrders/my_order_screen.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Profile/profile/profile_info_page.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Profile/profile/widget/profile_tile_widget.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -41,7 +44,7 @@ class ProfileScreenViewState extends State<ProfileScreenView> {
     super.dispose();
   }
 
-  void _navigateToProfileInfo() async {
+  void navigateToProfileInfo() async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -76,13 +79,13 @@ class ProfileScreenViewState extends State<ProfileScreenView> {
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
-  void _showDeleteAccountDialog() {
+  void showDeleteAccountDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Delete Account',
-              style: TextStyle(color: Colors.black)),
+          title: Text('Delete Account',
+              style: MyTextStyle.f16(appPrimaryColor, weight: FontWeight.bold)),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -90,32 +93,51 @@ class ProfileScreenViewState extends State<ProfileScreenView> {
               children: [
                 Text(
                   'Your account can\'t be restored after deletion',
-                  style:
-                      TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                  style: MyTextStyle.f13(redColor, weight: FontWeight.w400),
                 ),
                 const SizedBox(height: 10),
-                const Text(
+                Text(
                   'Are you sure you want to delete your account?',
-                  style: TextStyle(color: Colors.black),
+                  style: MyTextStyle.f13(appSecondaryColor,
+                      weight: FontWeight.w400),
                 ),
                 const SizedBox(height: 20),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Flexible(
-                      child: CustomButton(
-                        text: 'CANCEL',
-                        onPressed: () => Navigator.pop(context),
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.3,
+                      decoration: BoxDecoration(
+                        color: whiteColor,
+                        border: Border.all(color: appPrimaryColor, width: 1.5),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: Text(
+                          "Cancel",
+                          style: MyTextStyle.f13(appSecondaryColor,
+                              weight: FontWeight.w400),
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 10),
-                    Flexible(
-                      child: CustomButton(
-                        text: 'DELETE',
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.3,
+                      decoration: BoxDecoration(
+                        color: appPrimaryColor,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: appPrimaryColor, width: 1.5),
+                      ),
+                      child: TextButton(
                         onPressed: () {
-                          Navigator.pop(context);
-                          _deleteAccount();
+                          Navigator.pop(context, true);
+                          //SystemNavigator.pop(); // Closes the app
                         },
+                        child: Text(
+                          "Delete",
+                          style: MyTextStyle.f13(whiteColor,
+                              weight: FontWeight.w400),
+                        ),
                       ),
                     ),
                   ],
@@ -128,7 +150,7 @@ class ProfileScreenViewState extends State<ProfileScreenView> {
     );
   }
 
-  void _showLogoutConfirmationDialog() {
+  void showLogoutConfirmationDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -140,22 +162,41 @@ class ProfileScreenViewState extends State<ProfileScreenView> {
           ),
           actions: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Flexible(
-                  child: CustomButton(
-                    text: 'NO',
-                    onPressed: () => Navigator.pop(context),
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.3,
+                  decoration: BoxDecoration(
+                    color: whiteColor,
+                    border: Border.all(color: appPrimaryColor, width: 1.5),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: Text(
+                      "Cancel",
+                      style: MyTextStyle.f13(appSecondaryColor,
+                          weight: FontWeight.w400),
+                    ),
                   ),
                 ),
-                const SizedBox(width: 10),
-                Flexible(
-                  child: CustomButton(
-                    text: 'YES',
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.3,
+                  decoration: BoxDecoration(
+                    color: appPrimaryColor,
+                    border: Border.all(color: appPrimaryColor, width: 1.5),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: TextButton(
                     onPressed: () {
-                      Navigator.pop(context);
-                      _logout();
+                      Navigator.pop(context, true);
+                      // SystemNavigator.pop(); // Closes the app
                     },
+                    child: Text(
+                      "Logout",
+                      style:
+                          MyTextStyle.f13(whiteColor, weight: FontWeight.w400),
+                    ),
                   ),
                 ),
               ],
@@ -166,34 +207,8 @@ class ProfileScreenViewState extends State<ProfileScreenView> {
     );
   }
 
-  Widget _buildTile({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return Column(
-      children: [
-        ListTile(
-          leading: Icon(icon, color: appPrimaryColor),
-          title: Text(
-            title,
-            style: const TextStyle(
-              fontSize: 18,
-              color: Colors.black,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-          onTap: onTap,
-        ),
-        const Divider(height: 1),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
     Widget mainContainer() {
       return Column(
         children: [
@@ -207,34 +222,23 @@ class ProfileScreenViewState extends State<ProfileScreenView> {
             padding: const EdgeInsets.symmetric(vertical: 40),
             child: Column(
               children: [
-                GestureDetector(
-                  onTap: _navigateToProfileInfo,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: appSecondaryColor,
-                      shape: BoxShape.circle,
-                    ),
-                    padding: const EdgeInsets.all(4),
-                    child: CircleAvatar(
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    shape: BoxShape.circle,
+                  ),
+                  padding: const EdgeInsets.all(4),
+                  child: CircleAvatar(
                       radius: 45,
                       backgroundColor: Colors.white,
-                      backgroundImage: profileImage,
-                      child: profileImage == null
-                          ? const Icon(Icons.person,
-                              size: 60, color: appSecondaryColor)
-                          : null,
-                    ),
-                  ),
+                      backgroundImage: AssetImage(
+                        Images.profile,
+                      )),
                 ),
                 const SizedBox(height: 12),
-                Text(
-                  userName,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                Text(userName,
+                    style:
+                        MyTextStyle.f20(whiteColor, weight: FontWeight.w500)),
               ],
             ),
           ),
@@ -243,46 +247,54 @@ class ProfileScreenViewState extends State<ProfileScreenView> {
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(30),
-              ),
+                  color: whiteColor,
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: appPrimaryColor, width: 1)),
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: Column(
                 children: [
-                  _buildTile(
+                  CustomTile(
                     icon: Icons.person,
                     title: 'Personal Info',
-                    onTap: _navigateToProfileInfo,
+                    onTap: () {
+                      navigateToProfileInfo();
+                    },
                   ),
-                  _buildTile(
+                  CustomTile(
                     icon: Icons.shopping_bag_outlined,
                     title: 'My Orders',
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MyOrderScreen(),
+                        ),
+                      );
+                    },
                   ),
-                  _buildTile(
-                    icon: Icons.delete_outline,
-                    title: 'Delete My Account',
-                    onTap: _showDeleteAccountDialog,
-                  ),
-                  // Logout button
+                  CustomTile(
+                      icon: Icons.delete_outline,
+                      title: 'Delete My Account',
+                      onTap: () {
+                        showDeleteAccountDialog();
+                      }),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(15, 15, 15, 5),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFF7E67),
+                        color: appPrimaryColor,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: ListTile(
-                        leading: const Icon(Icons.logout, color: Colors.white),
-                        title: const Text(
-                          'Logout',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                          leading: const Icon(Icons.logout, color: whiteColor),
+                          title: Text(
+                            'Logout',
+                            style: MyTextStyle.f16(whiteColor,
+                                weight: FontWeight.w500),
                           ),
-                        ),
-                        onTap: _showLogoutConfirmationDialog,
-                      ),
+                          onTap: () {
+                            showLogoutConfirmationDialog();
+                          }),
                     ),
                   ),
                 ],
@@ -294,10 +306,21 @@ class ProfileScreenViewState extends State<ProfileScreenView> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFE0F7F5),
+      backgroundColor: whiteColor,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(55),
+        child: AppBar(
+          automaticallyImplyLeading: false,
+          elevation: 0,
+          backgroundColor: appPrimaryColor,
+          title: Text("Profile",
+              style: MyTextStyle.f20(whiteColor, weight: FontWeight.w600)),
+          centerTitle: true,
+        ),
+      ),
       body: BlocBuilder<DemoBloc, dynamic>(
         buildWhen: (previous, current) {
-          return false;
+          return true;
         },
         builder: (context, dynamic) {
           return mainContainer();
