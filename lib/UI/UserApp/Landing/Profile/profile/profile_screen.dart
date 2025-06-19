@@ -3,28 +3,28 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sentinix_ecommerce/Bloc/demo/demo_bloc.dart';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/Reusable/elevated_button.dart';
-import 'package:sentinix_ecommerce/UI/UserApp/Landing/Profile/profile_/profile_info_page.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Profile/profile/profile_info_page.dart';
 
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => DemoBloc(),
-      child: const ProfilePageView(),
+      child: const ProfileScreenView(),
     );
   }
 }
 
-class ProfilePageView extends StatefulWidget {
-  const ProfilePageView({super.key});
+class ProfileScreenView extends StatefulWidget {
+  const ProfileScreenView({super.key});
 
   @override
-  ProfilePageViewState createState() => ProfilePageViewState();
+  ProfileScreenViewState createState() => ProfileScreenViewState();
 }
 
-class ProfilePageViewState extends State<ProfilePageView> {
+class ProfileScreenViewState extends State<ProfileScreenView> {
   String userName = 'Sriram D';
   ImageProvider? profileImage;
   String? errorMessage;
@@ -81,7 +81,8 @@ class ProfilePageViewState extends State<ProfilePageView> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Delete Account', style: TextStyle(color: Colors.black)),
+          title: const Text('Delete Account',
+              style: TextStyle(color: Colors.black)),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -89,7 +90,8 @@ class ProfilePageViewState extends State<ProfilePageView> {
               children: [
                 Text(
                   'Your account can\'t be restored after deletion',
-                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                  style:
+                      TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
                 const Text(
@@ -189,110 +191,108 @@ class ProfilePageViewState extends State<ProfilePageView> {
     );
   }
 
-  Widget mainContainer() {
-    return Column(
-      children: [
-        // Top Profile Container with avatar
-        Container(
-          margin: const EdgeInsets.all(20),
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: appPrimaryColor,
-            borderRadius: BorderRadius.circular(30),
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 40),
-          child: Column(
-            children: [
-              GestureDetector(
-                onTap: _navigateToProfileInfo,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: appSecondaryColor,
-                    shape: BoxShape.circle,
-                  ),
-                  padding: const EdgeInsets.all(4),
-                  child: CircleAvatar(
-                    radius: 45,
-                    backgroundColor: Colors.white,
-                    backgroundImage: profileImage,
-                    child: profileImage == null
-                        ? const Icon(Icons.person, size: 60, color: appSecondaryColor)
-                        : null,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                userName,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        // White card section
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Container(
+  @override
+  Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
+    Widget mainContainer() {
+      return Column(
+        children: [
+          Container(
+            margin: const EdgeInsets.all(20),
             width: double.infinity,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: appPrimaryColor,
               borderRadius: BorderRadius.circular(30),
             ),
-            padding: const EdgeInsets.symmetric(vertical: 10),
+            padding: const EdgeInsets.symmetric(vertical: 40),
             child: Column(
               children: [
-                _buildTile(
-                  icon: Icons.person,
-                  title: 'Personal Info',
+                GestureDetector(
                   onTap: _navigateToProfileInfo,
-                ),
-                _buildTile(
-                  icon: Icons.shopping_bag_outlined,
-                  title: 'My Orders',
-                  onTap: () {},
-                ),
-                _buildTile(
-                  icon: Icons.delete_outline,
-                  title: 'Delete My Account',
-                  onTap: _showDeleteAccountDialog,
-                ),
-                // Logout button
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(15, 15, 15, 5),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFF7E67),
-                      borderRadius: BorderRadius.circular(20),
+                      color: appSecondaryColor,
+                      shape: BoxShape.circle,
                     ),
-                    child: ListTile(
-                      leading: const Icon(Icons.logout, color: Colors.white),
-                      title: const Text(
-                        'Logout',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      onTap: _showLogoutConfirmationDialog,
+                    padding: const EdgeInsets.all(4),
+                    child: CircleAvatar(
+                      radius: 45,
+                      backgroundColor: Colors.white,
+                      backgroundImage: profileImage,
+                      child: profileImage == null
+                          ? const Icon(Icons.person,
+                              size: 60, color: appSecondaryColor)
+                          : null,
                     ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  userName,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
             ),
           ),
-        ),
-      ],
-    );
-  }
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(30),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Column(
+                children: [
+                  _buildTile(
+                    icon: Icons.person,
+                    title: 'Personal Info',
+                    onTap: _navigateToProfileInfo,
+                  ),
+                  _buildTile(
+                    icon: Icons.shopping_bag_outlined,
+                    title: 'My Orders',
+                    onTap: () {},
+                  ),
+                  _buildTile(
+                    icon: Icons.delete_outline,
+                    title: 'Delete My Account',
+                    onTap: _showDeleteAccountDialog,
+                  ),
+                  // Logout button
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(15, 15, 15, 5),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFF7E67),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: ListTile(
+                        leading: const Icon(Icons.logout, color: Colors.white),
+                        title: const Text(
+                          'Logout',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onTap: _showLogoutConfirmationDialog,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    }
 
-  @override
-  Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: const Color(0xFFE0F7F5),
       body: BlocBuilder<DemoBloc, dynamic>(
