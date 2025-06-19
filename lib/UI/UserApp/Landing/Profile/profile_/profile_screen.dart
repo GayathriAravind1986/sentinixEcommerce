@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sentinix_ecommerce/Bloc/demo/demo_bloc.dart';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/Reusable/elevated_button.dart';
-import 'package:sentinix_ecommerce/lib/UI/profile_/profile/profile_info_page.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Profile/profile_/profile_info_page.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
