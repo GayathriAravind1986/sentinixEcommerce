@@ -208,18 +208,15 @@ class _HomeScreenViewState extends State<HomeScreenView> {
       );
     }
 
-    return WillPopScope(
-      onWillPop: () async => true,
-      child: Scaffold(
-        backgroundColor: whiteColor,
-        body: BlocBuilder<DemoBloc, dynamic>(
-          buildWhen: (previous, current) {
-            return false;
-          },
-          builder: (context, dynamic) {
-            return mainContainer();
-          },
-        ),
+    return Scaffold(
+      backgroundColor: whiteColor,
+      body: BlocBuilder<DemoBloc, dynamic>(
+        buildWhen: (previous, current) {
+          return false;
+        },
+        builder: (context, dynamic) {
+          return mainContainer();
+        },
       ),
     );
   }
