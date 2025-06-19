@@ -207,8 +207,6 @@ class ProfileInfoPageViewState extends State<ProfileInfoPageView> {
                           color: appSecondaryColor,
                           shape: BoxShape.circle,
                         ),
-                        padding: const EdgeInsets.all(6),
-                        child: const Icon(Icons.close, color: Colors.white, size: 16),
                       ),
                     ),
                   ),
