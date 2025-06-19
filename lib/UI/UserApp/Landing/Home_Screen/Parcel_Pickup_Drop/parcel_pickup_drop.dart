@@ -436,7 +436,7 @@ class _PickupDropViewState extends State<PickupDropView> {
               const SizedBox(height: 24),
               if (_pickupType == 1)
                 LocationFields(
-                  label: "Pickup Location",
+                  label: "Pickup Location ",
                   controllers: _pickupControllers,
                   showAddRemove: true,
                   onAdd: () {
@@ -448,19 +448,16 @@ class _PickupDropViewState extends State<PickupDropView> {
                       );
                     }
                   },
-
-
                   onRemove: () {
                     if (_pickupControllers.length > 1) {
                       setState(() => _pickupControllers.removeLast());
                     }
                   },
-
                 )
+
               else
                 LocationFields(
-                  label: "Pickup Location (${_pickupControllers.length}/5)",
-
+                  label: "Pickup Location ",
                   controllers: [_pickupControllers[0]],
                   showAddRemove: false,
                   onAdd: () {}, // Not used when `showAddRemove` is false
@@ -469,7 +466,7 @@ class _PickupDropViewState extends State<PickupDropView> {
 
               if (_pickupType == 2)
                 LocationFields(
-                  label: "Drop Location",
+                  label: "Drop Location ",
                   controllers: _dropControllers,
                   showAddRemove: true,
                   onAdd: () {
@@ -481,15 +478,13 @@ class _PickupDropViewState extends State<PickupDropView> {
                       );
                     }
                   },
-
-
                   onRemove: () {
                     if (_dropControllers.length > 1) {
                       setState(() => _dropControllers.removeLast());
                     }
                   },
-
                 )
+
               else
                 LocationFields(
                   label: "Drop Location",

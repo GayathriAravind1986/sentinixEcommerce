@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:sentinix_ecommerce/Reusable/alertdialog.dart';
+import 'package:sentinix_ecommerce/Alertbox/alertdialogBottomNav.dart';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Home_screen.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Notifications/notification.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/OrderScreen/order_screen.dart';
-import 'package:sentinix_ecommerce/UI/UserApp/Landing/Profile/Profile/profile_screen.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Profile/profile/profile_screen.dart';
 
 class DashBoardScreen extends StatefulWidget {
   final int? selectTab;
@@ -53,7 +53,12 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
     return WillPopScope(
       onWillPop: () async {
         if (_selectedIndex != 0) {
-          setState(() => _selectedIndex = 0);
+          setState(() {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => const DashBoardScreen()),
+              (Route<dynamic> route) => false,
+            );
+          });
           return false;
         } else {
           if (Navigator.of(context).canPop()) {

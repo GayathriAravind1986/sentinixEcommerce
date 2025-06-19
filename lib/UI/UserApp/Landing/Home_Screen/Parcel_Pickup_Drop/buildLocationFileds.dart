@@ -29,38 +29,49 @@ class LocationFields extends StatelessWidget {
               Text(label, style: Theme.of(context).textTheme.titleMedium),
               Row(
                 children: [
-                  if (controllers.length < 3)
-                    IconButton(
-                      icon: const Icon(Icons.add_circle_outline,
-                          color: appPrimaryColor),
-                      onPressed: onAdd,
-                      tooltip: 'Add $label',
-                    ),
-                  if (controllers.length > 1)
-                    IconButton(
-                      icon: const Icon(Icons.remove_circle_outline,
-                          color: redColor),
-                      onPressed: onRemove,
-                      tooltip: 'Remove $label',
-                    ),
+                  // ➖ Remove Icon: Disabled when only 1 field
+                  IconButton(
+                    icon: const Icon(Icons.remove_circle_outline),
+                    onPressed: controllers.length > 1 ? onRemove : null,
+                    color: controllers.length > 1
+                        ? redColor
+                        : Colors.grey.shade400,
+                    tooltip: 'Remove $label',
+                  ),
+
+                  // ➕ Add Icon: Disabled when already 5 fields
+                  IconButton(
+                    icon: const Icon(Icons.add_circle_outline),
+                    onPressed: controllers.length < 5 ? onAdd : null,
+                    color: controllers.length < 5
+                        ? appPrimaryColor
+                        : Colors.grey.shade400,
+                    tooltip: 'Add $label',
+                  ),
                 ],
               ),
             ],
           ),
+
+        const SizedBox(height: 8),
+
+        // All pickup/drop fields
         ...List.generate(controllers.length, (i) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: TextFormField(
               controller: controllers[i],
               decoration: InputDecoration(
-                labelText: '$label ${i + 1}',
+                labelText:
+                showAddRemove ? '$label ${i + 1}' : label,
                 border: const OutlineInputBorder(),
-                suffixIcon: i == 0
-                    ? const Icon(Icons.location_on, color: appPrimaryColor)
-                    : null,
+
+                // 📍 Always show location icon
+                suffixIcon: const Icon(Icons.location_on, color: appPrimaryColor),
               ),
-              validator: (value) => value == null || value.trim().isEmpty
-                  ? 'Please enter $label ${i + 1}'
+              validator: (value) =>
+              value == null || value.trim().isEmpty
+                  ? 'Please enter ${showAddRemove ? "$label ${i + 1}" : label}'
                   : null,
             ),
           );
