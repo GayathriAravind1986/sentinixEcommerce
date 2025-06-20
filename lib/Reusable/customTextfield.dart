@@ -5,7 +5,8 @@ import 'package:sentinix_ecommerce/Reusable/formatter.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
 
 class CustomTextField extends StatelessWidget {
-  const CustomTextField({
+  const CustomTextField
+      ({
     super.key,
     required this.hint,
     this.readOnly = false,
@@ -28,6 +29,7 @@ class CustomTextField extends StatelessWidget {
     this.isUpperCase = false,
     this.enableNricFormatter = false,
     this.height,
+    this.prefixIcon,
   });
 
   final String hint;
@@ -51,6 +53,9 @@ class CustomTextField extends StatelessWidget {
   final bool isUpperCase;
   final bool enableNricFormatter;
   final double? height;
+  final IconData? prefixIcon;
+
+
 
   @override
   Widget build(BuildContext context) {

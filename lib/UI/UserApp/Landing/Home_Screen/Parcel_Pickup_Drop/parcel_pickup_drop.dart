@@ -18,7 +18,8 @@ import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/buildVehicleOption.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/buildPaymentRow.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/buildSubmitButton.dart';
-
+import 'package:sentinix_ecommerce/Reusable/custom_phone_field.dart';
+import 'package:sentinix_ecommerce/Reusable/customTextfield.dart';
 
 class PickupDropScreen extends StatelessWidget {
   const PickupDropScreen({
@@ -163,12 +164,9 @@ class _PickupDropViewState extends State<PickupDropView> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
+               Text(
                 "Select Vehicle",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: MyTextStyle.f16(blackColor, weight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
           Column(
@@ -261,16 +259,13 @@ class _PickupDropViewState extends State<PickupDropView> {
               children: [
                 Text(
                   "Vehicle: $_selectedVehicle",
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
+                  style: MyTextStyle.f18(
+                      blackColor, weight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                const Text("# Total 3.14 km",
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text("# Total 3.14 km", style: MyTextStyle.f18(blackColor, weight: FontWeight.bold)),
                 const SizedBox(height: 20),
-                const Text("Payment Details",
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text("Payment Details", style: MyTextStyle.f16(blackColor, weight: FontWeight.bold)),
                 const SizedBox(height: 10),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -310,9 +305,9 @@ class _PickupDropViewState extends State<PickupDropView> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
+                    child:  Text(
                       "Place Order",
-                      style: TextStyle(color: whiteColor, fontSize: 16),
+                      style: MyTextStyle.f16( whiteColor),
                     ),
                   ),
                 ),
@@ -327,8 +322,7 @@ class _PickupDropViewState extends State<PickupDropView> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text("Confirm Order",
-            style: TextStyle(color: appPrimaryColor)),
+        title: Text("Confirm Order", style: MyTextStyle.f16(appPrimaryColor, weight: FontWeight.bold)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -338,11 +332,10 @@ class _PickupDropViewState extends State<PickupDropView> {
             Text("Vehicle: $_selectedVehicle"),
             Text("Payment Method: $_selectedPaymentMethod"),
             const SizedBox(height: 16),
-            const Text("Total Amount:",
-                style: TextStyle(fontWeight: FontWeight.bold)),
+            Text("Total Amount:", style: MyTextStyle.f16(blackColor, weight: FontWeight.bold)),
             Text(
               _selectedVehicle == "Bike" ? "₹40.40" : "₹81.80",
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: MyTextStyle.f18(blackColor, weight: FontWeight.bold),
             ),
           ],
         ),
@@ -381,7 +374,7 @@ class _PickupDropViewState extends State<PickupDropView> {
       //       ScaffoldMessenger.of(context).showSnackBar(
       //         const SnackBar(
       //           content: Text("Please fill all required fields correctly"),
-      //           backgroundColor: Colors.red,
+      //           backgroundColor: redcolor,
       //         ),
       //       );
       //     }
@@ -495,42 +488,31 @@ class _PickupDropViewState extends State<PickupDropView> {
                 ),
 
               const SizedBox(height: 12),
-              TextFormField(
+              CustomTextField(
+                hint: "Package Details",
                 controller: _packageController,
-                decoration: const InputDecoration(
-                  labelText: "Package Details",
-                  border: OutlineInputBorder(),
-                ),
-                maxLines: 2,
+                maxLine: 2,
                 validator: (val) => val == null || val.trim().isEmpty
                     ? "Enter package details"
                     : null,
               ),
               const SizedBox(height: 12),
-              VoiceRecorderTextField(
+              CustomTextField(
+                hint: "Special Instructions (Optional)",
                 controller: _instructionController,
-                decoration: const InputDecoration(
-                  labelText: "Special Instructions (Optional)",
-                  border: OutlineInputBorder(),
-                ),
-                maxLines: 2,
+                maxLine: 2,
                 maxLength: 200,
+                showSuffixIcon: true,
+                suffixIcon: Icon(Icons.mic, color: appPrimaryColor),
+              ),
+              const SizedBox(height: 12),
+              CustomPhoneField(
+                controller: _altPhoneController,
+                onPhoneChanged: (phoneNumber) {
+                  print("Phone number changed: $phoneNumber");
+                },
               ),
 
-              const SizedBox(height: 12),
-              IntlPhoneField(
-                controller: _altPhoneController,
-                initialCountryCode: 'IN',
-                showDropdownIcon: false,
-                keyboardType: TextInputType.phone,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: const InputDecoration(
-                  labelText: "Phone Number",
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.phone, color: appPrimaryColor),
-                ),
-                validator: (phone) => _validatePhoneNumber(phone?.number),
-              ),
               const SizedBox(height: 16),
       MediaPreviewWidget(
       mediaFiles: _mediaFiles,                     // List<File>

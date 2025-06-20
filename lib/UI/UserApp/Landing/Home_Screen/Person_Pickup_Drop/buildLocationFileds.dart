@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
+import 'package:sentinix_ecommerce/Reusable/customTextfield.dart';
 
 class LocationFields extends StatelessWidget {
   final String label;
@@ -59,21 +60,11 @@ class LocationFields extends StatelessWidget {
         ...List.generate(controllers.length, (i) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: TextFormField(
+            child:  CustomTextField(
+              hint: '$label ${i + 1}',
               controller: controllers[i],
-              decoration: InputDecoration(
-                labelText:
-                showAddRemove ? '$label ${i + 1}' : label,
-                border: const OutlineInputBorder(),
-
-                // 📍 Always show location icon
-                suffixIcon: const Icon(Icons.location_on, color: appPrimaryColor),
-              ),
-              validator: (value) =>
-              value == null || value.trim().isEmpty
-                  ? 'Please enter ${showAddRemove ? "$label ${i + 1}" : label}'
-                  : null,
-            ),
+              validator: (val) => val == null || val.trim().isEmpty ? 'Enter location' : null,
+            )
           );
         }),
       ],

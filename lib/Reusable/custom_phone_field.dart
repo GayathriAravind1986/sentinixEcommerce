@@ -6,8 +6,13 @@ import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
 
 class CustomPhoneField extends StatefulWidget {
   final Function(String completePhoneNumber) onPhoneChanged;
+  final TextEditingController? controller;
 
-  const CustomPhoneField({super.key, required this.onPhoneChanged});
+  const CustomPhoneField({
+    super.key,
+    required this.onPhoneChanged,
+    this.controller,
+  });
 
   @override
   State<CustomPhoneField> createState() => _CustomPhoneFieldState();

@@ -17,10 +17,10 @@ class Images {
   static const String backArrow = "assets/image/backarrow.png";
 
   //--Image (PNG/JPG)---
-  static const String banner_1 = 'assets/image/banner_1.png';
-  static const String banner_2 = 'assets/image/banner_2.jpg';
-  static const String banner_3 = 'assets/image/banner_3.jpg';
-  static const String banner_4 = 'assets/image/banner_4.jpg';
+  static const String banner_1 = 'assets/image/caroseal_1.jpg';
+  static const String banner_2 = 'assets/image/caroseal_2.jpg';
+  static const String banner_3 = 'assets/image/caroseal_3.jpg';
+  static const String banner_4 = 'assets/image/caroseal_4.jpg';
   static const String parcel = 'assets/image/parcel_pickup.png';
   static const String person = 'assets/image/person_1.png';
   static const String profile = 'assets/image/profile.png';
