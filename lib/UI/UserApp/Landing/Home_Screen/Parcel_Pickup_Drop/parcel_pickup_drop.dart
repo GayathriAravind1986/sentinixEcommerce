@@ -7,9 +7,18 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:sentinix_ecommerce/Bloc/demo/demo_bloc.dart';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
+import 'package:sentinix_ecommerce/Reusable/VoiceRecorder.dart';
 import 'package:sentinix_ecommerce/Reusable/elevated_button.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Navigation_Bar/Navigation_bar.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/buildBannerSlider.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/buildLocationFileds.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/buildMediaPreview.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/buildPaymentMethodOptionDialog.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/buildVehicleOption.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/buildPaymentRow.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/buildSubmitButton.dart';
+
 
 class PickupDropScreen extends StatelessWidget {
   const PickupDropScreen({
@@ -141,206 +150,6 @@ class _PickupDropViewState extends State<PickupDropView> {
       ),
     );
   }
-
-  Widget _buildBannerSlider() {
-    return Column(
-      children: [
-        AspectRatio(
-          aspectRatio: 16 / 9,
-          child: PageView.builder(
-            controller: _pageController,
-            itemCount: _banners.length,
-            onPageChanged: (index) => setState(() => _currentPage = index),
-            itemBuilder: (context, index) => ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                _banners[index],
-                fit: BoxFit.cover,
-                errorBuilder: (ctx, error, stack) => Container(
-                  color: greyShade300!,
-                  child: const Icon(Icons.broken_image),
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(_banners.length, (index) {
-            return AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              width: _currentPage == index ? 12 : 8,
-              height: 8,
-              decoration: BoxDecoration(
-                color: _currentPage == index ? appPrimaryColor : greyColor,
-                borderRadius: BorderRadius.circular(4),
-              ),
-            );
-          }),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildLocationFields(List<TextEditingController> controllers,
-      String label, bool showAddRemove) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (showAddRemove)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(label, style: Theme.of(context).textTheme.titleMedium),
-              Row(
-                children: [
-                  if (controllers.length < 3)
-                    IconButton(
-                      icon: const Icon(Icons.add_circle_outline,
-                          color: appPrimaryColor),
-                      onPressed: () => setState(
-                          () => controllers.add(TextEditingController())),
-                      tooltip: 'Add $label',
-                    ),
-                  if (controllers.length > 1)
-                    IconButton(
-                      icon: const Icon(Icons.remove_circle_outline,
-                          color: redColor),
-                      onPressed: () => setState(() => controllers.removeLast()),
-                      tooltip: 'Remove $label',
-                    ),
-                ],
-              )
-            ],
-          ),
-        ...List.generate(controllers.length, (i) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: TextFormField(
-              controller: controllers[i],
-              decoration: InputDecoration(
-                labelText: '$label ${i + 1}',
-                border: const OutlineInputBorder(),
-                suffixIcon: i == 0
-                    ? const Icon(Icons.location_on, color: appPrimaryColor)
-                    : null,
-              ),
-              validator: (value) => value == null || value.trim().isEmpty
-                  ? 'Please enter $label ${i + 1}'
-                  : null,
-            ),
-          );
-        }),
-      ],
-    );
-  }
-
-  Widget _buildMediaPreview() {
-    if (_mediaFiles.isEmpty) {
-      return GestureDetector(
-        onTap: _showMediaPicker,
-        child: Container(
-          width: double.infinity,
-          height: 120,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: appPrimaryColor),
-            color: greyShade300!,
-          ),
-          child: const Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.add_photo_alternate,
-                    color: appPrimaryColor, size: 30),
-                SizedBox(height: 8),
-                Text("Add Images or Videos (Optional)",
-                    style: TextStyle(color: appPrimaryColor)),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text("Uploaded Media",
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              ..._mediaFiles.asMap().entries.map((entry) {
-                final index = entry.key;
-                final file = entry.value;
-                return Container(
-                  margin: const EdgeInsets.only(right: 12),
-                  width: 120,
-                  height: 120,
-                  child: Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.file(
-                          file,
-                          width: 120,
-                          height: 120,
-                          fit: BoxFit.cover,
-                          errorBuilder: (ctx, error, stack) => Container(
-                            color: greyShade300!,
-                            child: const Icon(Icons.broken_image),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: 0,
-                        right: 0,
-                        child: IconButton(
-                          icon: const Icon(Icons.cancel,
-                              color: redColor, size: 20),
-                          onPressed: () => _removeMedia(index),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }),
-              if (_mediaFiles.length < 3)
-                GestureDetector(
-                  onTap: _showMediaPicker,
-                  child: Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: appPrimaryColor),
-                      color: greyShade300!,
-                    ),
-                    child: const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.add, color: appPrimaryColor, size: 30),
-                          SizedBox(height: 4),
-                          Text("Add More",
-                              style: TextStyle(color: appPrimaryColor)),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
   void _showVehicleSelectionDialog() {
     showDialog(
       context: context,
@@ -362,7 +171,9 @@ class _PickupDropViewState extends State<PickupDropView> {
                 ),
               ),
               const SizedBox(height: 16),
-              _buildVehicleOption(
+          Column(
+            children: [
+              VehicleOptionTile(
                 icon: Icons.electric_bike,
                 name: "Bike",
                 selected: _selectedVehicle == "Bike",
@@ -374,7 +185,7 @@ class _PickupDropViewState extends State<PickupDropView> {
                 color: appPrimaryColor,
               ),
               const SizedBox(height: 8),
-              _buildVehicleOption(
+              VehicleOptionTile(
                 icon: Icons.directions_car,
                 name: "Car",
                 selected: _selectedVehicle == "Car",
@@ -387,51 +198,13 @@ class _PickupDropViewState extends State<PickupDropView> {
               ),
             ],
           ),
+            ],
+
+        ),
         ),
       ),
     );
   }
-
-  Widget _buildVehicleOption({
-    required IconData icon,
-    required String name,
-    required bool selected,
-    required VoidCallback onTap,
-    required Color color,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 100),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color:
-              selected ? color.withOpacity(0.2) : greyColor.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: selected ? color : greyShade300!,
-            width: selected ? 2 : 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: selected ? color : greyColor),
-            const SizedBox(width: 12),
-            Text(
-              name,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: selected ? color : blackColor,
-              ),
-            ),
-            const Spacer(),
-            if (selected) Icon(Icons.check, color: color, size: 20),
-          ],
-        ),
-      ),
-    );
-  }
-
   void _showPaymentMethodSelection() {
     showDialog(
       context: context,
@@ -445,45 +218,32 @@ class _PickupDropViewState extends State<PickupDropView> {
               const Text("Select Payment Method",
                   style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
-              _buildPaymentMethodOptionDialog("Online", Icons.credit_card, () {
-                setState(() => _selectedPaymentMethod = "Online");
-                Navigator.pop(context);
-                _showPaymentSummary();
-              }),
-              const SizedBox(height: 8),
-              _buildPaymentMethodOptionDialog("COD", Icons.money, () {
-                setState(() => _selectedPaymentMethod = "COD");
-                Navigator.pop(context);
-                _showPaymentSummary();
-              }),
-            ],
+          PaymentMethodOption(
+            method: "Online",
+            icon: Icons.credit_card,
+            onTap: () {
+              setState(() => _selectedPaymentMethod = "Online");
+              Navigator.pop(context);
+              _showPaymentSummary();
+            },
           ),
+          const SizedBox(height: 8),
+          PaymentMethodOption(
+            method: "COD",
+            icon: Icons.money,
+            onTap: () {
+              setState(() => _selectedPaymentMethod = "COD");
+              Navigator.pop(context);
+              _showPaymentSummary();
+            },
+          ),
+            ],
+
+        ),
         ),
       ),
     );
   }
-
-  Widget _buildPaymentMethodOptionDialog(
-      String method, IconData icon, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          border: Border.all(color: greyColor),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: appPrimaryColor),
-            const SizedBox(width: 12),
-            Text(method),
-          ],
-        ),
-      ),
-    );
-  }
-
   void _showPaymentSummary() {
     Navigator.push(
       context,
@@ -512,26 +272,31 @@ class _PickupDropViewState extends State<PickupDropView> {
                 const Text("Payment Details",
                     style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 10),
-                _buildPaymentRow(
-                  "Base Fare",
-                  _selectedVehicle == "Bike" ? "20.00" : "40.00",
-                  icon: Icons.price_change,
-                ),
-                _buildPaymentRow(
-                  "Distance Charge",
-                  _selectedVehicle == "Bike" ? "19.00" : "39.00",
-                  icon: Icons.directions,
-                ),
-                _buildPaymentRow(
-                  "Additional 0.1 km",
-                  _selectedVehicle == "Bike" ? "1.40" : "2.80",
-                  icon: Icons.add_road,
-                ),
-                _buildPaymentRow(
-                  "To Pay",
-                  _selectedVehicle == "Bike" ? "40.40" : "81.80",
-                  isTotal: true,
-                  icon: Icons.payments,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    PaymentRow(
+                      label: "Base Fare",
+                      amount: _selectedVehicle == "Bike" ? "₹20.00" : "₹40.00",
+                      icon: Icons.price_change,
+                    ),
+                    PaymentRow(
+                      label: "Distance Charge",
+                      amount: _selectedVehicle == "Bike" ? "₹19.00" : "₹39.00",
+                      icon: Icons.directions,
+                    ),
+                    PaymentRow(
+                      label: "Additional 0.1 km",
+                      amount: _selectedVehicle == "Bike" ? "₹1.40" : "₹2.80",
+                      icon: Icons.add_road,
+                    ),
+                    PaymentRow(
+                      label: "To Pay",
+                      amount: _selectedVehicle == "Bike" ? "₹40.40" : "₹81.80",
+                      isTotal: true,
+                      icon: Icons.payments,
+                    ),
+                  ],
                 ),
                 const Spacer(),
                 SizedBox(
@@ -558,38 +323,6 @@ class _PickupDropViewState extends State<PickupDropView> {
       ),
     );
   }
-
-  Widget _buildPaymentRow(String label, String amount,
-      {bool isTotal = false, IconData? icon}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              if (icon != null) ...[
-                Icon(icon, size: 20, color: appPrimaryColor),
-                const SizedBox(width: 8),
-              ],
-              Text(label,
-                  style: TextStyle(
-                    fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-                    color: isTotal ? appPrimaryColor : null,
-                  )),
-            ],
-          ),
-          Text(amount,
-              style: TextStyle(
-                fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-                color: isTotal ? appPrimaryColor : null,
-                fontSize: isTotal ? 18 : null,
-              )),
-        ],
-      ),
-    );
-  }
-
   void _showConfirmationDialog() {
     showDialog(
       context: context,
@@ -640,25 +373,7 @@ class _PickupDropViewState extends State<PickupDropView> {
       ),
     );
   }
-
-  Widget _buildSubmitButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: CustomButton(
-          text: "Continue",
-          onPressed: () {
-            if (_formKey.currentState!.validate()) {
-              _showVehicleSelectionDialog();
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Please fill all required fields correctly"),
-                  backgroundColor: redColor,
-                ),
-              );
-            }
-          }),
-      // ElevatedButton.icon(
+  // ElevatedButton.icon(
       //   onPressed: () {
       //     if (_formKey.currentState!.validate()) {
       //       _showVehicleSelectionDialog();
@@ -681,8 +396,8 @@ class _PickupDropViewState extends State<PickupDropView> {
       //     ),
       //   ),
       // ),
-    );
-  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -693,7 +408,7 @@ class _PickupDropViewState extends State<PickupDropView> {
           key: _formKey,
           child: Column(
             children: [
-              _buildBannerSlider(),
+              BannerSlider(banners: _banners),
               const SizedBox(height: 24),
               ToggleButtons(
                 isSelected: [
@@ -720,23 +435,76 @@ class _PickupDropViewState extends State<PickupDropView> {
               ),
               const SizedBox(height: 24),
               if (_pickupType == 1)
-                _buildLocationFields(
-                    _pickupControllers, "Pickup Location", true)
+                LocationFields(
+                  label: "Pickup Location",
+                  controllers: _pickupControllers,
+                  showAddRemove: true,
+                  onAdd: () {
+                    if (_pickupControllers.length < 5) {
+                      setState(() => _pickupControllers.add(TextEditingController()));
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Maximum 5 pickup locations allowed")),
+                      );
+                    }
+                  },
+
+
+                  onRemove: () {
+                    if (_pickupControllers.length > 1) {
+                      setState(() => _pickupControllers.removeLast());
+                    }
+                  },
+
+                )
               else
-                _buildLocationFields(
-                    [_pickupControllers[0]], "Pickup Location", false),
+                LocationFields(
+                  label: "Pickup Location (${_pickupControllers.length}/5)",
+
+                  controllers: [_pickupControllers[0]],
+                  showAddRemove: false,
+                  onAdd: () {}, // Not used when `showAddRemove` is false
+                  onRemove: () {}, // Not used when `showAddRemove` is false
+                ),
+
               if (_pickupType == 2)
-                _buildLocationFields(_dropControllers, "Drop Location", true)
+                LocationFields(
+                  label: "Drop Location",
+                  controllers: _dropControllers,
+                  showAddRemove: true,
+                  onAdd: () {
+                    if (_dropControllers.length < 5) {
+                      setState(() => _dropControllers.add(TextEditingController()));
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Maximum 5 drop locations allowed")),
+                      );
+                    }
+                  },
+
+
+                  onRemove: () {
+                    if (_dropControllers.length > 1) {
+                      setState(() => _dropControllers.removeLast());
+                    }
+                  },
+
+                )
               else
-                _buildLocationFields(
-                    [_dropControllers[0]], "Drop Location", false),
+                LocationFields(
+                  label: "Drop Location",
+                  controllers: [_dropControllers[0]],
+                  showAddRemove: false,
+                  onAdd: () {},
+                  onRemove: () {},
+                ),
+
               const SizedBox(height: 12),
               TextFormField(
                 controller: _packageController,
                 decoration: const InputDecoration(
                   labelText: "Package Details",
                   border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.inventory, color: appPrimaryColor),
                 ),
                 maxLines: 2,
                 validator: (val) => val == null || val.trim().isEmpty
@@ -744,16 +512,16 @@ class _PickupDropViewState extends State<PickupDropView> {
                     : null,
               ),
               const SizedBox(height: 12),
-              TextFormField(
+              VoiceRecorderTextField(
                 controller: _instructionController,
                 decoration: const InputDecoration(
                   labelText: "Special Instructions (Optional)",
                   border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.note, color: appPrimaryColor),
                 ),
                 maxLines: 2,
                 maxLength: 200,
               ),
+
               const SizedBox(height: 12),
               IntlPhoneField(
                 controller: _altPhoneController,
@@ -769,9 +537,16 @@ class _PickupDropViewState extends State<PickupDropView> {
                 validator: (phone) => _validatePhoneNumber(phone?.number),
               ),
               const SizedBox(height: 16),
-              _buildMediaPreview(),
+      MediaPreviewWidget(
+      mediaFiles: _mediaFiles,                     // List<File>
+      onAddMedia: _showMediaPicker,                // VoidCallback
+      onRemoveMedia: (index) => _removeMedia(index), // Function(int)
+      ),
               const SizedBox(height: 24),
-              _buildSubmitButton(),
+      SubmitButton(
+      formKey: _formKey,
+      onValid: _showVehicleSelectionDialog,
+      ),
             ],
           ),
         ),
