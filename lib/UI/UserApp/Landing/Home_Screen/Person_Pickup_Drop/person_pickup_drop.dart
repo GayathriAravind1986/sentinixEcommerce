@@ -425,14 +425,16 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
                     : null,
               ),
               const SizedBox(height: 12),
-              CustomTextField(
-                hint: "Special Instructions (Optional)",
+              VoiceRecorderTextField(
                 controller: _instructionController,
-                maxLine: 2,
+                maxLines: 2,
                 maxLength: 200,
-                showSuffixIcon: true,
-                suffixIcon: Icon(Icons.mic, color: appPrimaryColor),
+                decoration: InputDecoration(
+                  labelText: "Special Instructions (Optional)",
+                  border: OutlineInputBorder(),
+                ),
               ),
+
               const SizedBox(height: 12),
               CustomPhoneField(
                 controller: _altPhoneController,

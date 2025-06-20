@@ -50,6 +50,8 @@ class _PickupDropViewState extends State<PickupDropView> {
   String _selectedPaymentMethod = 'COD';
   String? _selectedVehicle;
   late Timer _timer;
+  bool isTyping = false;
+  bool isMicActive = false;
 
   final _pickupControllers = [TextEditingController()];
   final _dropControllers = [TextEditingController()];
@@ -497,20 +499,14 @@ class _PickupDropViewState extends State<PickupDropView> {
                     : null,
               ),
               const SizedBox(height: 12),
-              CustomTextField(
-                hint: "Special Instructions (Optional)",
+              VoiceRecorderTextField(
                 controller: _instructionController,
-                maxLine: 2,
+                maxLines: 2,
                 maxLength: 200,
-                showSuffixIcon: true,
-                suffixIcon: Icon(Icons.mic, color: appPrimaryColor),
-              ),
-              const SizedBox(height: 12),
-              CustomPhoneField(
-                controller: _altPhoneController,
-                onPhoneChanged: (phoneNumber) {
-                  print("Phone number changed: $phoneNumber");
-                },
+                decoration: InputDecoration(
+                  labelText: "Special Instructions (Optional)",
+                  border: OutlineInputBorder(),
+                ),
               ),
 
               const SizedBox(height: 16),
