@@ -241,7 +241,7 @@ class ProfileInfoPageViewState extends State<ProfileInfoPageView> {
     var size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit profile_', style: TextStyle(color: Colors.black)),
+        title: const Text('Edit profile', style: TextStyle(color: Colors.black)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
