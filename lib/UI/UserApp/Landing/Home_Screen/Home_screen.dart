@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sentinix_ecommerce/Bloc/demo/demo_bloc.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/parcel_pickup_drop.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/person_pickupanddrop.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/widget/home_card_widget.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'dart:async';
@@ -180,11 +181,20 @@ class _HomeScreenViewState extends State<HomeScreenView> {
             ),
           ),
           const SizedBox(height: 16),
-          ServiceCard(
-            title: 'Person Pickup & Drop',
-            image: Images.person,
-            iconColor: appPrimaryColor,
-            imageBackground: appSecondaryColor,
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const PersonPickupDropScreen()),
+              );
+            },
+            child: ServiceCard(
+              title: 'Person Pickup & Drop',
+              image: Images.person,
+              iconColor: appPrimaryColor,
+              imageBackground: appSecondaryColor,
+            ),
           ),
         ],
       ),
