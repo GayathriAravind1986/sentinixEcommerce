@@ -8,6 +8,8 @@ class LocationFields extends StatelessWidget {
   final bool showAddRemove;
   final VoidCallback onAdd;
   final VoidCallback onRemove;
+  final Function(int index)? onTap;
+
 
   const LocationFields({
     super.key,
@@ -16,6 +18,7 @@ class LocationFields extends StatelessWidget {
     required this.showAddRemove,
     required this.onAdd,
     required this.onRemove,
+    required this.onTap,
   });
 
   @override
@@ -63,6 +66,12 @@ class LocationFields extends StatelessWidget {
             child:  CustomTextField(
               hint: '$label ${i + 1}',
               controller: controllers[i],
+              readOnly: true,
+              onTap: () {
+                if (onTap != null){
+                  onTap!(i);
+                }
+              },
               validator: (val) => val == null || val.trim().isEmpty ? 'Enter location' : null,
             )
           );

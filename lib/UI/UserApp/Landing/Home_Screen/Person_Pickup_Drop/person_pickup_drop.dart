@@ -13,6 +13,7 @@ import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/Reusable/VoiceRecorder.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Navigation_Bar/Navigation_bar.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/GoogleMap/google_map_widget.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Person_Pickup_Drop/buildBannerSlider.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Person_Pickup_Drop/buildLocationFileds.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Person_Pickup_Drop/buildMediaPreview.dart';
@@ -50,6 +51,8 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
   String? _selectedVehicle;
   late Timer _timer;
 
+
+
   final _pickupControllers = [TextEditingController()];
   final _dropControllers = [TextEditingController()];
   final _packageController = TextEditingController();
@@ -80,7 +83,24 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
     for (var c in _dropControllers) c.dispose();
     super.dispose();
   }
+  Future<void> _navigateToMapAndSetLocation(int index, bool isPickup) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const LocationPickerScreen(),
+      ),
+    );
 
+    if (result != null && result is String) {
+      setState(() {
+        if (isPickup) {
+          _pickupControllers[index].text = result;
+        } else {
+          _dropControllers[index].text = result;
+        }
+      });
+    }
+  }
   void _startAutoSlider() {
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
       if (mounted) {
@@ -383,7 +403,7 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
                 LocationFields(
                   label: "Pickup Location",
                   controllers: _pickupControllers,
-                  showAddRemove: true,
+                  showAddRemove: _pickupType == 1,
                   onAdd: () {
                     if (_pickupControllers.length < 4) {
                       setState(() => _pickupControllers.add(TextEditingController()));
@@ -398,6 +418,7 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
                       setState(() => _pickupControllers.removeLast());
                     }
                   },
+                  onTap: (index) => _navigateToMapAndSetLocation(index, true),
                 )
               else
                 LocationFields(
@@ -406,6 +427,7 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
                   showAddRemove: false,
                   onAdd: () {},
                   onRemove: () {},
+                  onTap: (index) => _navigateToMapAndSetLocation(index, true),
                 ),
               const SizedBox(height: 12),
               LocationFields(
@@ -414,6 +436,8 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
                 showAddRemove: false,
                 onAdd: () {},
                 onRemove: () {},
+                onTap: (index) => _navigateToMapAndSetLocation(index, false),
+
               ),
               const SizedBox(height: 12),
               CustomTextField(

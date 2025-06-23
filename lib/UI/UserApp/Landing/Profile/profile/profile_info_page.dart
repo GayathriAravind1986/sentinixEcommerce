@@ -67,33 +67,46 @@ class ProfileInfoPageViewState extends State<ProfileInfoPageView> {
     super.dispose();
   }
 
-  Future<void> _pickImage() async {
-    final source = await showDialog<ImageSource>(
+  void _showMediaPicker() {
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Select Image Source', style: TextStyle(color: Colors.black)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, ImageSource.camera),
-            child: Text('Camera', style: TextStyle(color: appPrimaryColor)),
+      builder: (ctx) => Wrap(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.camera_alt, color: appPrimaryColor),
+            title: const Text("Camera"),
+            onTap: () {
+              Navigator.pop(ctx);
+              _pickMedia(ImageSource.camera);
+            },
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, ImageSource.gallery),
-            child: Text('Gallery', style: TextStyle(color: appPrimaryColor)),
-          ),
+          ListTile(
+            leading: const Icon(Icons.photo_library, color: appPrimaryColor),
+            title: const Text("Gallery"),
+            onTap: () {
+              Navigator.pop(ctx);
+              _pickMedia(ImageSource.gallery);
+            },
+          )
         ],
       ),
     );
+  }
+  void _removeImage() => setState(() => customAvatar = null);
 
-    if (source != null) {
-      final pickedFile = await picker.pickImage(source: source);
-      if (pickedFile != null) {
-        setState(() => customAvatar = FileImage(File(pickedFile.path)));
-      }
+  Future<void> _pickMedia(ImageSource source) async {
+    final pickedFile = await picker.pickImage(source: source);
+    if (pickedFile != null) {
+      setState(() {
+        customAvatar = FileImage(File(pickedFile.path));
+      });
     }
   }
 
-  void _removeImage() => setState(() => customAvatar = null);
+  void _pickImage() {
+    _showMediaPicker();
+  }
+
 
   void _pickDOB() async {
     DateTime? picked = await showDatePicker(

@@ -80,6 +80,7 @@ class CustomTextField extends StatelessWidget {
                 readOnly: readOnly,
                 obscureText: obscureText,
                 keyboardType: inputType,
+                onTap: onTap,
                 expands: false,
                 textCapitalization: isUpperCase
                     ? TextCapitalization.characters
@@ -95,7 +96,6 @@ class CustomTextField extends StatelessWidget {
                 maxLength: maxLength,
                 maxLines: maxLine ?? 1,
                 onChanged: onChanged,
-                onTap: onTap,
                 validator: validator,
                 textAlignVertical: TextAlignVertical.center,
                 decoration: InputDecoration(

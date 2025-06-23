@@ -20,6 +20,7 @@ import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/buildSubmitButton.dart';
 import 'package:sentinix_ecommerce/Reusable/custom_phone_field.dart';
 import 'package:sentinix_ecommerce/Reusable/customTextfield.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/GoogleMap/google_map_widget.dart';
 
 class PickupDropScreen extends StatelessWidget {
   const PickupDropScreen({
@@ -121,6 +122,25 @@ class _PickupDropViewState extends State<PickupDropView> {
           SnackBar(content: Text('Failed to pick image: ${e.toString()}')),
         );
       }
+    }
+  }
+
+  Future<void> _navigateToMapAndSetLocation(int index, bool isPickup) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const LocationPickerScreen(),
+      ),
+    );
+
+    if (result != null && result is String) {
+      setState(() {
+        if (isPickup) {
+          _pickupControllers[index].text = result;
+        } else {
+          _dropControllers[index].text = result;
+        }
+      });
     }
   }
 
@@ -448,6 +468,7 @@ class _PickupDropViewState extends State<PickupDropView> {
                       setState(() => _pickupControllers.removeLast());
                     }
                   },
+                  onTap: (index) => _navigateToMapAndSetLocation(index, true),
                 )
 
               else
@@ -455,8 +476,9 @@ class _PickupDropViewState extends State<PickupDropView> {
                   label: "Pickup Location ",
                   controllers: [_pickupControllers[0]],
                   showAddRemove: false,
-                  onAdd: () {}, // Not used when `showAddRemove` is false
-                  onRemove: () {}, // Not used when `showAddRemove` is false
+                  onAdd: () {},
+                  onRemove: () {},
+                  onTap: (index) => _navigateToMapAndSetLocation(index, true),
                 ),
 
               if (_pickupType == 2)
@@ -478,6 +500,7 @@ class _PickupDropViewState extends State<PickupDropView> {
                       setState(() => _dropControllers.removeLast());
                     }
                   },
+                  onTap: (index) => _navigateToMapAndSetLocation(index, false),
                 )
 
               else
@@ -487,6 +510,7 @@ class _PickupDropViewState extends State<PickupDropView> {
                   showAddRemove: false,
                   onAdd: () {},
                   onRemove: () {},
+                  onTap: (index) => _navigateToMapAndSetLocation(index, false),
                 ),
 
               const SizedBox(height: 12),
