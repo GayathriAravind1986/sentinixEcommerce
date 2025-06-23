@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:sentinix_ecommerce/Bloc/demo/demo_bloc.dart';
@@ -21,6 +23,7 @@ import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Person_Pickup_
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Person_Pickup_Drop/buildVehicleOption.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Person_Pickup_Drop/buildPaymentRow.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Person_Pickup_Drop/buildSubmitButton.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Person_Pickup_Drop/add_address.dart';
 
 class PersonPickupDropScreen extends StatelessWidget {
   const PersonPickupDropScreen({super.key});
@@ -50,6 +53,9 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
   String _selectedPaymentMethod = 'COD';
   String? _selectedVehicle;
   late Timer _timer;
+  LatLng? _selectedPosition;
+  bool _isSelectingPickup = true;
+  int _currentLocationIndex = 0;
 
 
 
@@ -83,24 +89,72 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
     for (var c in _dropControllers) c.dispose();
     super.dispose();
   }
-  Future<void> _navigateToMapAndSetLocation(int index, bool isPickup) async {
-    final result = await Navigator.push(
+  Future<String> getAddressFromLatLng(LatLng position) async {
+    try {
+      List<Placemark> addressLatLon = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+      final Placemark place = addressLatLon.first;
+      final placeName = place.name ?? '';
+      final streetName = place.thoroughfare ?? place.subLocality ?? '';
+      final subLocality = place.subLocality ?? '';
+      final city = place.locality ?? '';
+      final state = place.administrativeArea ?? '';
+      final country = place.country ?? '';
+      debugPrint("placeName:${place.name}");
+      debugPrint("placeStreet:${place.street}");
+      debugPrint("placeSub:${place.subLocality}");
+      debugPrint("placeThoro:${place.thoroughfare}");
+      debugPrint("placeLoc:${place.locality}");
+      debugPrint("placeAdmin:${place.administrativeArea}");
+      debugPrint("placeCountry:${place.country}");
+      return [streetName, city, state, country]
+          .where((part) => part.isNotEmpty)
+          .join(', ');
+    } catch (e) {
+      debugPrint("Error during reverse geocoding: $e");
+      return "Address not found";
+    }
+  }
+  Future<void> selectAddress(bool isPickup, int index) async {
+    final Address? selectedAddress = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const LocationPickerScreen(),
+        builder: (context) => AddressFlowScreen(
+          initialPosition: _selectedPosition, // Now this will work
+        ),
       ),
     );
 
-    if (result != null && result is String) {
+    if (selectedAddress != null && mounted) {
       setState(() {
         if (isPickup) {
-          _pickupControllers[index].text = result;
+          _pickupControllers[index].text = selectedAddress.fullAddress;
         } else {
-          _dropControllers[index].text = result;
+          _dropControllers[index].text = selectedAddress.fullAddress;
         }
       });
     }
   }
+  // Future<void> _navigateToMapAndSetLocation(int index, bool isPickup) async {
+  //   final result = await Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) => const LocationPickerScreen(),
+  //     ),
+  //   );
+  //
+  //   if (result != null && result is String) {
+  //     setState(() {
+  //       if (isPickup) {
+  //         _pickupControllers[index].text = result;
+  //       } else {
+  //         _dropControllers[index].text = result;
+  //       }
+  //     });
+  //   }
+  // }
   void _startAutoSlider() {
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
       if (mounted) {
@@ -418,7 +472,7 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
                       setState(() => _pickupControllers.removeLast());
                     }
                   },
-                  onTap: (index) => _navigateToMapAndSetLocation(index, true),
+                    onTap: (index) => selectAddress(true, index),
                 )
               else
                 LocationFields(
@@ -427,7 +481,7 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
                   showAddRemove: false,
                   onAdd: () {},
                   onRemove: () {},
-                  onTap: (index) => _navigateToMapAndSetLocation(index, true),
+                    onTap: (index) => selectAddress(true, index),
                 ),
               const SizedBox(height: 12),
               LocationFields(
@@ -436,7 +490,7 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
                 showAddRemove: false,
                 onAdd: () {},
                 onRemove: () {},
-                onTap: (index) => _navigateToMapAndSetLocation(index, false),
+                onTap: (index) => selectAddress(false, index),
 
               ),
               const SizedBox(height: 12),
@@ -455,7 +509,20 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
                 maxLength: 200,
                 decoration: InputDecoration(
                   labelText: "Special Instructions (Optional)",
-                  border: OutlineInputBorder(),
+                  hintStyle: TextStyle(color: Colors.grey),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.orange, width: 2),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),
               ),
 

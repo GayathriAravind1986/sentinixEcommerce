@@ -30,6 +30,7 @@ class CustomTextField extends StatelessWidget {
     this.enableNricFormatter = false,
     this.height,
     this.prefixIcon,
+    this.keyboardType,
   });
 
   final String hint;
@@ -54,6 +55,7 @@ class CustomTextField extends StatelessWidget {
   final bool enableNricFormatter;
   final double? height;
   final IconData? prefixIcon;
+  final TextInputType? keyboardType;
 
 
 
@@ -134,6 +136,7 @@ class CustomTextField extends StatelessWidget {
                   ),
                   suffixIcon: showSuffixIcon ? suffixIcon : null,
                 ),
+
               ),
             ),
           ),

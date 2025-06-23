@@ -3,14 +3,18 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:sentinix_ecommerce/Bloc/demo/demo_bloc.dart';
+import 'package:sentinix_ecommerce/Reusable/customTextfield.dart';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/Reusable/VoiceRecorder.dart';
 import 'package:sentinix_ecommerce/Reusable/elevated_button.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Navigation_Bar/Navigation_bar.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/add_address.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/buildBannerSlider.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/buildLocationFileds.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/buildMediaPreview.dart';
@@ -19,7 +23,6 @@ import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/buildPaymentRow.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/buildSubmitButton.dart';
 import 'package:sentinix_ecommerce/Reusable/custom_phone_field.dart';
-import 'package:sentinix_ecommerce/Reusable/customTextfield.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/GoogleMap/google_map_widget.dart';
 
 class PickupDropScreen extends StatelessWidget {
@@ -53,6 +56,9 @@ class _PickupDropViewState extends State<PickupDropView> {
   late Timer _timer;
   bool isTyping = false;
   bool isMicActive = false;
+  LatLng? _selectedPosition;
+  bool _isSelectingPickup = true;
+  int _currentLocationIndex = 0;
 
   final _pickupControllers = [TextEditingController()];
   final _dropControllers = [TextEditingController()];
@@ -125,24 +131,73 @@ class _PickupDropViewState extends State<PickupDropView> {
     }
   }
 
-  Future<void> _navigateToMapAndSetLocation(int index, bool isPickup) async {
-    final result = await Navigator.push(
+  Future<void> selectAddress(bool isPickup, int index) async {
+    final Address? selectedAddress = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const LocationPickerScreen(),
+        builder: (context) => AddressFlowScreen(
+          initialPosition: _selectedPosition, // Now this will work
+        ),
       ),
     );
 
-    if (result != null && result is String) {
+    if (selectedAddress != null && mounted) {
       setState(() {
         if (isPickup) {
-          _pickupControllers[index].text = result;
+          _pickupControllers[index].text = selectedAddress.fullAddress;
         } else {
-          _dropControllers[index].text = result;
+          _dropControllers[index].text = selectedAddress.fullAddress;
         }
       });
     }
   }
+
+  Future<String> getAddressFromLatLng(LatLng position) async {
+    try {
+      List<Placemark> addressLatLon = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+      final Placemark place = addressLatLon.first;
+      final placeName = place.name ?? '';
+      final streetName = place.thoroughfare ?? place.subLocality ?? '';
+      final subLocality = place.subLocality ?? '';
+      final city = place.locality ?? '';
+      final state = place.administrativeArea ?? '';
+      final country = place.country ?? '';
+      debugPrint("placeName:${place.name}");
+      debugPrint("placeStreet:${place.street}");
+      debugPrint("placeSub:${place.subLocality}");
+      debugPrint("placeThoro:${place.thoroughfare}");
+      debugPrint("placeLoc:${place.locality}");
+      debugPrint("placeAdmin:${place.administrativeArea}");
+      debugPrint("placeCountry:${place.country}");
+      return [streetName, city, state, country]
+          .where((part) => part.isNotEmpty)
+          .join(', ');
+    } catch (e) {
+      debugPrint("Error during reverse geocoding: $e");
+      return "Address not found";
+    }
+  }
+  // Future<void> _navigateToMapAndSetLocation(int index, bool isPickup) async {
+  //   final result = await Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) => const LocationPickerScreen(),
+  //     ),
+  //   );
+  //
+  //   if (result != null && result is String) {
+  //     setState(() {
+  //       if (isPickup) {
+  //         _pickupControllers[index].text = result;
+  //       } else {
+  //         _dropControllers[index].text = result;
+  //       }
+  //     });
+  //   }
+  // }
 
   void _removeMedia(int index) {
     if (mounted) setState(() => _mediaFiles.removeAt(index));
@@ -453,7 +508,7 @@ class _PickupDropViewState extends State<PickupDropView> {
                 LocationFields(
                   label: "Pickup Location ",
                   controllers: _pickupControllers,
-                  showAddRemove: true,
+                  showAddRemove: _pickupType==1,
                   onAdd: () {
                     if (_pickupControllers.length < 5) {
                       setState(() => _pickupControllers.add(TextEditingController()));
@@ -468,9 +523,8 @@ class _PickupDropViewState extends State<PickupDropView> {
                       setState(() => _pickupControllers.removeLast());
                     }
                   },
-                  onTap: (index) => _navigateToMapAndSetLocation(index, true),
+                  onTap: (index) => selectAddress(true, index),
                 )
-
               else
                 LocationFields(
                   label: "Pickup Location ",
@@ -478,14 +532,14 @@ class _PickupDropViewState extends State<PickupDropView> {
                   showAddRemove: false,
                   onAdd: () {},
                   onRemove: () {},
-                  onTap: (index) => _navigateToMapAndSetLocation(index, true),
+                  onTap: (index) => selectAddress(true, index),
                 ),
 
               if (_pickupType == 2)
                 LocationFields(
                   label: "Drop Location ",
                   controllers: _dropControllers,
-                  showAddRemove: true,
+                  showAddRemove: _pickupType==2,
                   onAdd: () {
                     if (_dropControllers.length < 5) {
                       setState(() => _dropControllers.add(TextEditingController()));
@@ -500,9 +554,8 @@ class _PickupDropViewState extends State<PickupDropView> {
                       setState(() => _dropControllers.removeLast());
                     }
                   },
-                  onTap: (index) => _navigateToMapAndSetLocation(index, false),
+                  onTap: (index) => selectAddress(false, index),
                 )
-
               else
                 LocationFields(
                   label: "Drop Location",
@@ -510,7 +563,7 @@ class _PickupDropViewState extends State<PickupDropView> {
                   showAddRemove: false,
                   onAdd: () {},
                   onRemove: () {},
-                  onTap: (index) => _navigateToMapAndSetLocation(index, false),
+                  onTap: (index) => selectAddress(false, index),
                 ),
 
               const SizedBox(height: 12),
@@ -529,21 +582,41 @@ class _PickupDropViewState extends State<PickupDropView> {
                 maxLength: 200,
                 decoration: InputDecoration(
                   labelText: "Special Instructions (Optional)",
-                  border: OutlineInputBorder(),
+                  hintStyle: TextStyle(color: Colors.grey),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.orange, width: 2),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),
               ),
+              const SizedBox(height: 12),
+              CustomPhoneField(
+                controller: _altPhoneController,
 
+                onPhoneChanged: (phoneNumber) {
+                  print("Phone number changed: $phoneNumber");
+                },
+              ),
               const SizedBox(height: 16),
-      MediaPreviewWidget(
-      mediaFiles: _mediaFiles,                     // List<File>
-      onAddMedia: _showMediaPicker,                // VoidCallback
-      onRemoveMedia: (index) => _removeMedia(index), // Function(int)
-      ),
+              MediaPreviewWidget(
+                mediaFiles: _mediaFiles,
+                onAddMedia: _showMediaPicker,
+                onRemoveMedia: (index) => _removeMedia(index),
+              ),
               const SizedBox(height: 24),
-      SubmitButton(
-      formKey: _formKey,
-      onValid: _showVehicleSelectionDialog,
-      ),
+              SubmitButton(
+                formKey: _formKey,
+                onValid: _showVehicleSelectionDialog,
+              ),
             ],
           ),
         ),

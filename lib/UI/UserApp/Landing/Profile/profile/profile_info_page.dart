@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:sentinix_ecommerce/Bloc/demo/demo_bloc.dart';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/Reusable/elevated_button.dart';
+import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
 
 class ProfileInfoPage extends StatelessWidget {
   final String userName;
@@ -254,25 +255,15 @@ class ProfileInfoPageViewState extends State<ProfileInfoPageView> {
     var size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit profile', style: TextStyle(color: Colors.black)),
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        backgroundColor: appPrimaryColor,
+        centerTitle: true,
+        title:  Text('Edit profile', style: MyTextStyle.f20(whiteColor, weight: FontWeight.w600)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          TextButton(
-            onPressed: _saveProfile,
-            child: const Text(
-              'SAVE',
-              style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
-        elevation: 0,
-        backgroundColor: Colors.white,
       ),
       body: BlocBuilder<DemoBloc, dynamic>(
         buildWhen: (previous, current) {
