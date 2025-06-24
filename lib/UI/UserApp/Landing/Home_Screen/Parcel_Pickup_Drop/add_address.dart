@@ -8,6 +8,29 @@ import 'package:sentinix_ecommerce/Reusable/customTextfield.dart';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
 
+// Pincode Service for Tirunelveli
+class PincodeService {
+  static Future<Map<String, String>?> getLocationFromPincode(String pincode) async {
+    // Tirunelveli pincodes
+    final pincodeData = {
+      '627001': {'district': 'Tirunelveli', 'state': 'Tamil Nadu'},
+      '627002': {'district': 'Tirunelveli', 'state': 'Tamil Nadu'},
+      '627003': {'district': 'Tirunelveli', 'state': 'Tamil Nadu'},
+      '627004': {'district': 'Tirunelveli', 'state': 'Tamil Nadu'},
+      '627005': {'district': 'Tirunelveli', 'state': 'Tamil Nadu'},
+      '627006': {'district': 'Tirunelveli', 'state': 'Tamil Nadu'},
+      '627007': {'district': 'Tirunelveli', 'state': 'Tamil Nadu'},
+      '627008': {'district': 'Tirunelveli', 'state': 'Tamil Nadu'},
+      '627009': {'district': 'Tirunelveli', 'state': 'Tamil Nadu'},
+      '627011': {'district': 'Tirunelveli', 'state': 'Tamil Nadu'},
+      '627012': {'district': 'Tirunelveli', 'state': 'Tamil Nadu'},
+    };
+
+    await Future.delayed(const Duration(milliseconds: 300));
+    return pincodeData[pincode]?.cast<String, String>();
+  }
+}
+
 // Address Model
 class Address {
   final String id;
@@ -18,6 +41,12 @@ class Address {
   final String houseNo;
   final String floorNo;
   final String? buildingName;
+  final String? street;
+  final String? area;
+  final String city;
+  final String state;
+  final String pincode;
+  final String country;
 
   Address({
     required this.id,
@@ -28,6 +57,12 @@ class Address {
     required this.houseNo,
     required this.floorNo,
     this.buildingName,
+    this.street,
+    this.area,
+    required this.city,
+    required this.state,
+    required this.pincode,
+    this.country = "India",
   });
 
   Map<String, dynamic> toJson() => {
@@ -42,6 +77,12 @@ class Address {
     'houseNo': houseNo,
     'floorNo': floorNo,
     'buildingName': buildingName,
+    'street': street,
+    'area': area,
+    'city': city,
+    'state': state,
+    'pincode': pincode,
+    'country': country,
   };
 
   factory Address.fromJson(Map<String, dynamic> json) => Address(
@@ -56,6 +97,12 @@ class Address {
     houseNo: json['houseNo'],
     floorNo: json['floorNo'],
     buildingName: json['buildingName'],
+    street: json['street'],
+    area: json['area'],
+    city: json['city'],
+    state: json['state'],
+    pincode: json['pincode'],
+    country: json['country'],
   );
 }
 
@@ -145,17 +192,24 @@ class AddressFlowBloc extends Bloc<AddressFlowEvent, AddressFlowState> {
   final _houseNoController = TextEditingController();
   final _floorNoController = TextEditingController();
   final _buildingController = TextEditingController();
+  final _streetController = TextEditingController();
+  final _areaController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _stateController = TextEditingController();
+  final _pincodeController = TextEditingController();
   final _customTypeController = TextEditingController();
   late GoogleMapController _mapController;
-  static const LatLng bangalorePosition = LatLng(12.9716, 77.5946);
+  static const LatLng tirunelveliPosition = LatLng(8.7139, 77.7567);
   static const int maxAddresses = 10;
 
   AddressFlowBloc({LatLng? initialPosition})
       : super(AddressFlowState(
     currentStep: 0,
     addresses: [],
-    initialPosition: initialPosition ?? bangalorePosition,
+    initialPosition: initialPosition ?? tirunelveliPosition,
   )) {
+    _setupPincodeListener();
+
     on<ChangeStepEvent>((event, emit) {
       emit(state.copyWith(currentStep: event.step));
     });
@@ -177,9 +231,9 @@ class AddressFlowBloc extends Bloc<AddressFlowEvent, AddressFlowState> {
         return;
       }
 
-      if (_houseNoController.text.isEmpty || _floorNoController.text.isEmpty) {
+      if (!_validateFormFields()) {
         ScaffoldMessenger.of(event.context).showSnackBar(
-          SnackBar(content: Text("House and Floor numbers are required", style: MyTextStyle.f14(whiteColor))),
+          SnackBar(content: Text("Please fill all required fields correctly", style: MyTextStyle.f14(whiteColor))),
         );
         return;
       }
@@ -191,16 +245,23 @@ class AddressFlowBloc extends Bloc<AddressFlowEvent, AddressFlowState> {
       final newAddress = Address(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         title: title,
-        fullAddress: "${state.displayAddress}, "
-            "${_buildingController.text.isNotEmpty ? '${_buildingController.text}, ' : ''}"
-            "${_houseNoController.text}",
-        displayAddress: state.displayAddress,
+        fullAddress: "${_houseNoController.text}, ${_floorNoController.text}" +
+            (_buildingController.text.isNotEmpty ? ", ${_buildingController.text}" : "") +
+            (_streetController.text.isNotEmpty ? ", ${_streetController.text}" : "") +
+            (_areaController.text.isNotEmpty ? ", ${_areaController.text}" : "") +
+            ", ${_cityController.text}, ${_stateController.text} - ${_pincodeController.text}",
+        displayAddress: _areaController.text.isNotEmpty
+            ? "${_areaController.text}, ${_cityController.text}"
+            : _cityController.text,
         coordinates: state.selectedLocation!,
         houseNo: _houseNoController.text,
         floorNo: _floorNoController.text,
-        buildingName: _buildingController.text.isNotEmpty
-            ? _buildingController.text
-            : null,
+        buildingName: _buildingController.text.isNotEmpty ? _buildingController.text : null,
+        street: _streetController.text.isNotEmpty ? _streetController.text : null,
+        area: _areaController.text.isNotEmpty ? _areaController.text : null,
+        city: _cityController.text,
+        state: _stateController.text,
+        pincode: _pincodeController.text,
       );
 
       final updatedAddresses = List<Address>.from(state.addresses)..add(newAddress);
@@ -217,10 +278,7 @@ class AddressFlowBloc extends Bloc<AddressFlowEvent, AddressFlowState> {
         hasReachedLimit: updatedAddresses.length >= maxAddresses,
       ));
 
-      _houseNoController.clear();
-      _floorNoController.clear();
-      _buildingController.clear();
-      _customTypeController.clear();
+      _clearControllers();
 
       ScaffoldMessenger.of(event.context).showSnackBar(
         SnackBar(content: Text("Address added successfully", style: MyTextStyle.f14(whiteColor))),
@@ -251,7 +309,7 @@ class AddressFlowBloc extends Bloc<AddressFlowEvent, AddressFlowState> {
         await _saveAddresses(updatedAddresses);
         emit(state.copyWith(
           addresses: updatedAddresses,
-          hasReachedLimit: updatedAddresses.length >= maxAddresses,
+          hasReachedLimit: updatedAddresses.length < maxAddresses,
         ));
       }
     });
@@ -264,13 +322,50 @@ class AddressFlowBloc extends Bloc<AddressFlowEvent, AddressFlowState> {
       ));
     });
 
-    // Load initial addresses
     _loadAddresses().then((addresses) {
       emit(state.copyWith(
         addresses: addresses,
         hasReachedLimit: addresses.length >= maxAddresses,
       ));
     });
+  }
+
+  bool _validateFloorNumber(String value) {
+    return RegExp(r'^[0-9A-Za-z\- ]+$').hasMatch(value);
+  }
+
+  bool _validatePincode(String value) {
+    return RegExp(r'^[1-9][0-9]{5}$').hasMatch(value);
+  }
+
+  bool _validateFormFields() {
+    return _houseNoController.text.isNotEmpty &&
+        _validateFloorNumber(_floorNoController.text) &&
+        _validatePincode(_pincodeController.text);
+  }
+
+  void _setupPincodeListener() {
+    _pincodeController.addListener(() async {
+      if (_validatePincode(_pincodeController.text)) {
+        final location = await PincodeService.getLocationFromPincode(_pincodeController.text);
+        if (location != null) {
+          _cityController.text = location['district'] ?? 'Tirunelveli';
+          _stateController.text = location['state'] ?? 'Tamil Nadu';
+        }
+      }
+      validateForm();
+    });
+  }
+
+  void _clearControllers() {
+    _houseNoController.clear();
+    _floorNoController.clear();
+    _buildingController.clear();
+    _streetController.clear();
+    _areaController.clear();
+    _pincodeController.clear();
+    _customTypeController.clear();
+    // Don't clear city and state as they're auto-filled
   }
 
   Future<void> _saveAddresses(List<Address> addresses) async {
@@ -296,13 +391,7 @@ class AddressFlowBloc extends Bloc<AddressFlowEvent, AddressFlowState> {
   }
 
   void validateForm() {
-    emit(state.copyWith(
-        isFormValid: _houseNoController.text.isNotEmpty &&
-            _floorNoController.text.isNotEmpty &&
-            state.selectedLocation != null &&
-            (state.addressType != "OTHERS" ||
-                (_customTypeController.text.isNotEmpty && state.addressType == "OTHERS"))
-    ));
+    emit(state.copyWith(isFormValid: _validateFormFields()));
   }
 
   @override
@@ -310,6 +399,11 @@ class AddressFlowBloc extends Bloc<AddressFlowEvent, AddressFlowState> {
     _houseNoController.dispose();
     _floorNoController.dispose();
     _buildingController.dispose();
+    _streetController.dispose();
+    _areaController.dispose();
+    _cityController.dispose();
+    _stateController.dispose();
+    _pincodeController.dispose();
     _customTypeController.dispose();
     _mapController.dispose();
     return super.close();
@@ -356,16 +450,15 @@ class _AddressFlowScreenViewState extends State<AddressFlowScreenView> {
           builder: (context, state) {
             return Text(
               state.currentStep == 0
-                  ? "select the address"
+                  ? "Select Address"
                   : state.currentStep == 1
                   ? "Select Location"
-                  : "Add Address",
+                  : "Add Address Details",
               style: MyTextStyle.f20(whiteColor, weight: FontWeight.w600),
             );
           },
         ),
         centerTitle: true,
-
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: whiteColor),
           onPressed: () {
@@ -462,8 +555,18 @@ class AddressSelectionStep extends StatelessWidget {
                         'House No: ${address.houseNo}, Floor No: ${address.floorNo}',
                         style: MyTextStyle.f14(textColorDark),
                       ),
+                      if (address.street?.isNotEmpty ?? false)
+                        Text(
+                          address.street!,
+                          style: MyTextStyle.f14(textColorDark),
+                        ),
+                      if (address.area?.isNotEmpty ?? false)
+                        Text(
+                          address.area!,
+                          style: MyTextStyle.f14(textColorDark),
+                        ),
                       Text(
-                        address.displayAddress,
+                        '${address.city}, ${address.state} - ${address.pincode}',
                         style: MyTextStyle.f14(greyColor),
                       ),
                     ],
@@ -534,8 +637,8 @@ class MapSelectionStep extends StatelessWidget {
               if (placemarks.isNotEmpty) {
                 final place = placemarks.first;
                 displayAddress = [
-                  place.name,
-                  place.thoroughfare,
+                  place.street,
+                  place.subLocality,
                 ].where((part) => part != null && part!.isNotEmpty).join(", ");
               }
 
@@ -615,7 +718,7 @@ class MapSelectionStep extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  "Bangalore",
+                  "Selected Location",
                   style: MyTextStyle.f14(greyColor),
                 ),
                 const SizedBox(height: 16),
@@ -650,8 +753,16 @@ class MapSelectionStep extends StatelessWidget {
 }
 
 // Step 3: Address Details
-class AddressDetailsStep extends StatelessWidget {
+class AddressDetailsStep extends StatefulWidget {
   const AddressDetailsStep({super.key});
+
+  @override
+  State<AddressDetailsStep> createState() => _AddressDetailsStepState();
+}
+
+class _AddressDetailsStepState extends State<AddressDetailsStep> {
+  String? _floorNumberError;
+  String? _pincodeError;
 
   @override
   Widget build(BuildContext context) {
@@ -671,28 +782,97 @@ class AddressDetailsStep extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            "Bangalore",
+            "Selected Location",
             style: MyTextStyle.f14(greyColor),
           ),
           const SizedBox(height: 24),
+
+          // House/Flat Number (Required)
           CustomTextField(
             controller: bloc._houseNoController,
             hint: "House / Flat no *",
             onChanged: (value) => bloc.validateForm(),
           ),
           const SizedBox(height: 16),
-          CustomTextField(
-            controller: bloc._floorNoController,
-            hint: "Floor number *",
-            keyboardType: TextInputType.number,
-            onChanged: (value) => bloc.validateForm(),
+
+          // Floor Number (Required with validation)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomTextField(
+                controller: bloc._floorNoController,
+                hint: "Floor number *",
+                onChanged: (value) {
+                  setState(() {
+                    _floorNumberError = bloc._validateFloorNumber(value)
+                        ? null
+                        : "Only alphanumeric characters and hyphens allowed";
+                  });
+                  bloc.validateForm();
+                },
+              ),
+              if (_floorNumberError != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: Text(
+                    _floorNumberError!,
+                    style: MyTextStyle.f12(redColor),
+                  ),
+                ),
+            ],
           ),
           const SizedBox(height: 16),
+
+          // Building/Apartment Name (Optional)
           CustomTextField(
             controller: bloc._buildingController,
-            hint: "Apartment / Building name (If Any)",
+            hint: "Apartment / Building name (Optional)",
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
+
+          // Street (Optional)
+          CustomTextField(
+            controller: bloc._streetController,
+            hint: "Street (Optional)",
+          ),
+          const SizedBox(height: 16),
+
+          // Area (Optional)
+          CustomTextField(
+            controller: bloc._areaController,
+            hint: "Area/Locality (Optional)",
+          ),
+          const SizedBox(height: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomTextField(
+                controller: bloc._pincodeController,
+                hint: "Pincode *",
+                keyboardType: TextInputType.number,
+                maxLength: 6,
+                onChanged: (value) {
+                  setState(() {
+                    _pincodeError = bloc._validatePincode(value)
+                        ? null
+                        : "Enter a valid 6-digit pincode";
+                  });
+                  bloc.validateForm();
+                },
+              ),
+              if (_pincodeError != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: Text(
+                    _pincodeError!,
+                    style: MyTextStyle.f12(redColor),
+                  ),
+                ),
+            ],
+          ),
+
+          // Address Type Selection
+          const SizedBox(height: 16),
           Text(
             "Save this address as *",
             style: MyTextStyle.f16(textColorDark, weight: FontWeight.bold),
@@ -707,7 +887,6 @@ class AddressDetailsStep extends StatelessWidget {
                   selected: state.addressType == "HOME",
                   onSelected: (selected) {
                     bloc.updateAddressType("HOME");
-                    bloc.validateForm();
                   },
                   selectedColor: appPrimaryColor,
                   backgroundColor: greyShade300,
@@ -721,7 +900,6 @@ class AddressDetailsStep extends StatelessWidget {
                   selected: state.addressType == "OFFICE",
                   onSelected: (selected) {
                     bloc.updateAddressType("OFFICE");
-                    bloc.validateForm();
                   },
                   selectedColor: appPrimaryColor,
                   backgroundColor: greyShade300,
@@ -735,7 +913,6 @@ class AddressDetailsStep extends StatelessWidget {
                   selected: state.addressType == "OTHERS",
                   onSelected: (selected) {
                     bloc.updateAddressType("OTHERS");
-                    bloc.validateForm();
                   },
                   selectedColor: appPrimaryColor,
                   backgroundColor: greyShade300,
@@ -743,18 +920,17 @@ class AddressDetailsStep extends StatelessWidget {
               ),
             ],
           ),
+
           if (state.addressType == "OTHERS") ...[
             const SizedBox(height: 16),
             CustomTextField(
               controller: bloc._customTypeController,
-              hint: "Enter address",
-              onChanged: (value) {
-                bloc.updateCustomType(value);
-                bloc.validateForm();
-              },
+              hint: "Enter address type (e.g., Friend's place) (Optional)",
             ),
           ],
           const SizedBox(height: 32),
+
+          // Add Address Button
           if (!state.hasReachedLimit)
             SizedBox(
               width: double.infinity,
