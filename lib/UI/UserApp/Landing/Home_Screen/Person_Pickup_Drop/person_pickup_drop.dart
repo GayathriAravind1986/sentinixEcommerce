@@ -10,7 +10,7 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:sentinix_ecommerce/Bloc/demo/demo_bloc.dart';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/Reusable/customTextfield.dart';
-import 'package:sentinix_ecommerce/Reusable/custom_phone_field.dart';
+import 'package:sentinix_ecommerce/Reusable/alternative_number.dart';
 import 'package:sentinix_ecommerce/Reusable/VoiceRecorder.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Navigation_Bar/Navigation_bar.dart';
@@ -510,25 +510,13 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
               const SizedBox(height: 12),
               VoiceRecorderTextField(controller: _instructionController),
               const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.only(left: 20, right: 20), // force spacing
-                alignment: Alignment.center,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        height: 60,
-                        child: CustomPhoneField(
-                          controller: _altPhoneController,
-                          onPhoneChanged: (phoneNumber) {
-                            print("Phone number changed: $phoneNumber");
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              AlternativePhoneField(
+                controller: _altPhoneController,
+                onPhoneChanged: (val) {
+                  print("Alt Phone: $val");
+                },
               ),
+
 
 
               const SizedBox(height: 16),

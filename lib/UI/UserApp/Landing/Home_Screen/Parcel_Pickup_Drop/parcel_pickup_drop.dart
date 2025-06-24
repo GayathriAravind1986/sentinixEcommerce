@@ -11,7 +11,7 @@ import 'package:sentinix_ecommerce/Bloc/demo/demo_bloc.dart';
 import 'package:sentinix_ecommerce/Reusable/customTextfield.dart';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/Reusable/VoiceRecorder.dart';
-import 'package:sentinix_ecommerce/Reusable/elevated_button.dart';
+import 'package:sentinix_ecommerce/Reusable/alternative_number.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Navigation_Bar/Navigation_bar.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/add_address.dart';
@@ -22,7 +22,6 @@ import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/buildVehicleOption.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/buildPaymentRow.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/buildSubmitButton.dart';
-import 'package:sentinix_ecommerce/Reusable/custom_phone_field.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/GoogleMap/google_map_widget.dart';
 
 class PickupDropScreen extends StatelessWidget {
@@ -585,26 +584,15 @@ class _PickupDropViewState extends State<PickupDropView> {
               const SizedBox(height: 12),
               VoiceRecorderTextField(controller: _instructionController),
               const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                height: 60,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center, // Center the row contents
-                  children: [
-                    Expanded(
-                      child: Align( // Additional alignment control
-                        alignment: Alignment.center,
-                        child: CustomPhoneField(
-                          controller: _altPhoneController,
-                          onPhoneChanged: (phoneNumber) {
-                            print("Phone number changed: $phoneNumber");
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              AlternativePhoneField(
+                controller: _altPhoneController,
+                onPhoneChanged: (val) {
+                  print("Alt Phone: $val");
+                },
               ),
+
+
+
               const SizedBox(height: 16),
               MediaPreviewWidget(
                 mediaFiles: _mediaFiles,
