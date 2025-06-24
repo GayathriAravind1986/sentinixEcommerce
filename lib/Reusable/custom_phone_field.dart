@@ -50,7 +50,7 @@ class _CustomPhoneFieldState extends State<CustomPhoneField> {
       dropdownIconPosition: IconPosition.trailing,
       inputFormatters: formatters,
       keyboardType: TextInputType.number,
-      style: MyTextStyle.f15(blackColor, weight: FontWeight.w400),
+      style: MyTextStyle.f15(greyColor, weight: FontWeight.w400),
       cursorColor: appPrimaryColor,
       onChanged: (phone) {
         widget.onPhoneChanged(phone.completeNumber);

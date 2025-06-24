@@ -497,7 +497,6 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
               CustomTextField(
                 hint: "Package Details",
                 controller: _packageController,
-                maxLine: 2,
                 validator: (val) => val == null || val.trim().isEmpty
                     ? "Enter package details"
                     : null,
