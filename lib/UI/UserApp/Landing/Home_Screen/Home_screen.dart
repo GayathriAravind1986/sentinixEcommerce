@@ -163,7 +163,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
 
   Widget _buildServiceCards() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.all(20),
       child: Column(
         children: [
           InkWell(
@@ -189,6 +189,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                     builder: (_) => const PersonPickupDropScreen()),
               );
             },
+
             child: ServiceCard(
               title: 'Person Pickup & Drop',
               image: Images.person,

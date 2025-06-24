@@ -118,12 +118,40 @@ class SelectLocationEvent extends AddressFlowEvent {
   final LatLng location;
   final String address;
   final String displayAddress;
-  SelectLocationEvent(this.location, this.address, this.displayAddress);
+  final String pincode;
+  final String city;
+  final String state;
+
+  SelectLocationEvent(
+      this.location,
+      this.address,
+      this.displayAddress,
+      this.pincode,
+      this.city,
+      this.state,
+      );
 }
 
 class AddAddressEvent extends AddressFlowEvent {
   final BuildContext context;
-  AddAddressEvent(this.context);
+  final String houseNo;
+  final String floorNo;
+  final String? buildingName;
+  final String? street;
+  final String? area;
+  final String addressType;
+  final String? customAddressType;
+
+  AddAddressEvent(
+      this.context,
+      this.houseNo,
+      this.floorNo,
+      this.buildingName,
+      this.street,
+      this.area,
+      this.addressType,
+      this.customAddressType,
+      );
 }
 
 class RemoveAddressEvent extends AddressFlowEvent {
@@ -141,10 +169,10 @@ class AddressFlowState {
   final LatLng? selectedLocation;
   final String selectedAddress;
   final String displayAddress;
-  final String addressType;
-  final String? customAddressType;
+  final String? selectedPincode;
+  final String? selectedCity;
+  final String? selectedState;
   final LatLng initialPosition;
-  final bool isFormValid;
   final bool hasReachedLimit;
 
   AddressFlowState({
@@ -153,10 +181,10 @@ class AddressFlowState {
     this.selectedLocation,
     this.selectedAddress = "Tap on map to select location",
     this.displayAddress = "",
-    this.addressType = "HOME",
-    this.customAddressType,
+    this.selectedPincode,
+    this.selectedCity,
+    this.selectedState,
     required this.initialPosition,
-    this.isFormValid = false,
     this.hasReachedLimit = false,
   });
 
@@ -166,10 +194,10 @@ class AddressFlowState {
     LatLng? selectedLocation,
     String? selectedAddress,
     String? displayAddress,
-    String? addressType,
-    String? customAddressType,
+    String? selectedPincode,
+    String? selectedCity,
+    String? selectedState,
     LatLng? initialPosition,
-    bool? isFormValid,
     bool? hasReachedLimit,
   }) {
     return AddressFlowState(
@@ -178,10 +206,10 @@ class AddressFlowState {
       selectedLocation: selectedLocation ?? this.selectedLocation,
       selectedAddress: selectedAddress ?? this.selectedAddress,
       displayAddress: displayAddress ?? this.displayAddress,
-      addressType: addressType ?? this.addressType,
-      customAddressType: customAddressType ?? this.customAddressType,
+      selectedPincode: selectedPincode ?? this.selectedPincode,
+      selectedCity: selectedCity ?? this.selectedCity,
+      selectedState: selectedState ?? this.selectedState,
       initialPosition: initialPosition ?? this.initialPosition,
-      isFormValid: isFormValid ?? this.isFormValid,
       hasReachedLimit: hasReachedLimit ?? this.hasReachedLimit,
     );
   }
@@ -189,15 +217,6 @@ class AddressFlowState {
 
 // BLoC
 class AddressFlowBloc extends Bloc<AddressFlowEvent, AddressFlowState> {
-  final _houseNoController = TextEditingController();
-  final _floorNoController = TextEditingController();
-  final _buildingController = TextEditingController();
-  final _streetController = TextEditingController();
-  final _areaController = TextEditingController();
-  final _cityController = TextEditingController();
-  final _stateController = TextEditingController();
-  final _pincodeController = TextEditingController();
-  final _customTypeController = TextEditingController();
   late GoogleMapController _mapController;
   static const LatLng tirunelveliPosition = LatLng(8.7139, 77.7567);
   static const int maxAddresses = 10;
@@ -208,8 +227,6 @@ class AddressFlowBloc extends Bloc<AddressFlowEvent, AddressFlowState> {
     addresses: [],
     initialPosition: initialPosition ?? tirunelveliPosition,
   )) {
-    _setupPincodeListener();
-
     on<ChangeStepEvent>((event, emit) {
       emit(state.copyWith(currentStep: event.step));
     });
@@ -219,6 +236,9 @@ class AddressFlowBloc extends Bloc<AddressFlowEvent, AddressFlowState> {
         selectedLocation: event.location,
         selectedAddress: event.address,
         displayAddress: event.displayAddress,
+        selectedPincode: event.pincode,
+        selectedCity: event.city,
+        selectedState: event.state,
       ));
     });
 
@@ -226,42 +246,48 @@ class AddressFlowBloc extends Bloc<AddressFlowEvent, AddressFlowState> {
       if (state.addresses.length >= maxAddresses) {
         emit(state.copyWith(hasReachedLimit: true));
         ScaffoldMessenger.of(event.context).showSnackBar(
-          SnackBar(content: Text("Maximum $maxAddresses addresses reached", style: MyTextStyle.f14(whiteColor))),
+          SnackBar(
+            content: Text(
+              "Maximum $maxAddresses addresses reached",
+              style: MyTextStyle.f14(whiteColor),
+            ),
+          ),
         );
         return;
       }
 
-      if (!_validateFormFields()) {
-        ScaffoldMessenger.of(event.context).showSnackBar(
-          SnackBar(content: Text("Please fill all required fields correctly", style: MyTextStyle.f14(whiteColor))),
-        );
-        return;
-      }
+      final title = event.addressType == "OTHERS"
+          ? event.customAddressType ?? "OTHER"
+          : event.addressType;
 
-      final title = state.addressType == "OTHERS"
-          ? state.customAddressType ?? "OTHER"
-          : state.addressType;
+      // Build address parts
+      final addressParts = [
+        event.houseNo,
+        event.floorNo,
+        if (event.buildingName?.isNotEmpty ?? false) event.buildingName,
+        if (event.street?.isNotEmpty ?? false) event.street,
+        if (event.area?.isNotEmpty ?? false) event.area,
+        state.selectedCity ?? 'Tirunelveli',
+        state.selectedState ?? 'Tamil Nadu',
+        state.selectedPincode ?? '',
+      ].where((part) => part != null && part.isNotEmpty).toList();
 
       final newAddress = Address(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         title: title,
-        fullAddress: "${_houseNoController.text}, ${_floorNoController.text}" +
-            (_buildingController.text.isNotEmpty ? ", ${_buildingController.text}" : "") +
-            (_streetController.text.isNotEmpty ? ", ${_streetController.text}" : "") +
-            (_areaController.text.isNotEmpty ? ", ${_areaController.text}" : "") +
-            ", ${_cityController.text}, ${_stateController.text} - ${_pincodeController.text}",
-        displayAddress: _areaController.text.isNotEmpty
-            ? "${_areaController.text}, ${_cityController.text}"
-            : _cityController.text,
+        fullAddress: addressParts.join(", "),
+        displayAddress: event.area?.isNotEmpty ?? false
+            ? "${event.area}, ${state.selectedCity ?? 'Tirunelveli'}"
+            : state.selectedCity ?? 'Tirunelveli',
         coordinates: state.selectedLocation!,
-        houseNo: _houseNoController.text,
-        floorNo: _floorNoController.text,
-        buildingName: _buildingController.text.isNotEmpty ? _buildingController.text : null,
-        street: _streetController.text.isNotEmpty ? _streetController.text : null,
-        area: _areaController.text.isNotEmpty ? _areaController.text : null,
-        city: _cityController.text,
-        state: _stateController.text,
-        pincode: _pincodeController.text,
+        houseNo: event.houseNo,
+        floorNo: event.floorNo,
+        buildingName: event.buildingName,
+        street: event.street,
+        area: event.area,
+        city: state.selectedCity ?? 'Tirunelveli',
+        state: state.selectedState ?? 'Tamil Nadu',
+        pincode: state.selectedPincode ?? '',
       );
 
       final updatedAddresses = List<Address>.from(state.addresses)..add(newAddress);
@@ -273,15 +299,19 @@ class AddressFlowBloc extends Bloc<AddressFlowEvent, AddressFlowState> {
         selectedLocation: null,
         selectedAddress: "Tap on map to select location",
         displayAddress: "",
-        addressType: "HOME",
-        customAddressType: null,
+        selectedPincode: null,
+        selectedCity: null,
+        selectedState: null,
         hasReachedLimit: updatedAddresses.length >= maxAddresses,
       ));
 
-      _clearControllers();
-
       ScaffoldMessenger.of(event.context).showSnackBar(
-        SnackBar(content: Text("Address added successfully", style: MyTextStyle.f14(whiteColor))),
+        SnackBar(
+          content: Text(
+            "Address added successfully",
+            style: MyTextStyle.f14(whiteColor),
+          ),
+        ),
       );
     });
 
@@ -290,7 +320,10 @@ class AddressFlowBloc extends Bloc<AddressFlowEvent, AddressFlowState> {
         context: event.context,
         builder: (context) => AlertDialog(
           title: Text("Confirm Removal", style: MyTextStyle.f18(textColorDark)),
-          content: Text("Are you sure you want to remove this address?", style: MyTextStyle.f16(textColorDark)),
+          content: Text(
+            "Are you sure you want to remove this address?",
+            style: MyTextStyle.f16(textColorDark),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
@@ -309,7 +342,7 @@ class AddressFlowBloc extends Bloc<AddressFlowEvent, AddressFlowState> {
         await _saveAddresses(updatedAddresses);
         emit(state.copyWith(
           addresses: updatedAddresses,
-          hasReachedLimit: updatedAddresses.length < maxAddresses,
+          hasReachedLimit: updatedAddresses.length >= maxAddresses,
         ));
       }
     });
@@ -319,6 +352,9 @@ class AddressFlowBloc extends Bloc<AddressFlowEvent, AddressFlowState> {
         selectedLocation: null,
         selectedAddress: "Tap on map to select location",
         displayAddress: "",
+        selectedPincode: null,
+        selectedCity: null,
+        selectedState: null,
       ));
     });
 
@@ -328,44 +364,6 @@ class AddressFlowBloc extends Bloc<AddressFlowEvent, AddressFlowState> {
         hasReachedLimit: addresses.length >= maxAddresses,
       ));
     });
-  }
-
-  bool _validateFloorNumber(String value) {
-    return RegExp(r'^[0-9A-Za-z\- ]+$').hasMatch(value);
-  }
-
-  bool _validatePincode(String value) {
-    return RegExp(r'^[1-9][0-9]{5}$').hasMatch(value);
-  }
-
-  bool _validateFormFields() {
-    return _houseNoController.text.isNotEmpty &&
-        _validateFloorNumber(_floorNoController.text) &&
-        _validatePincode(_pincodeController.text);
-  }
-
-  void _setupPincodeListener() {
-    _pincodeController.addListener(() async {
-      if (_validatePincode(_pincodeController.text)) {
-        final location = await PincodeService.getLocationFromPincode(_pincodeController.text);
-        if (location != null) {
-          _cityController.text = location['district'] ?? 'Tirunelveli';
-          _stateController.text = location['state'] ?? 'Tamil Nadu';
-        }
-      }
-      validateForm();
-    });
-  }
-
-  void _clearControllers() {
-    _houseNoController.clear();
-    _floorNoController.clear();
-    _buildingController.clear();
-    _streetController.clear();
-    _areaController.clear();
-    _pincodeController.clear();
-    _customTypeController.clear();
-    // Don't clear city and state as they're auto-filled
   }
 
   Future<void> _saveAddresses(List<Address> addresses) async {
@@ -380,31 +378,8 @@ class AddressFlowBloc extends Bloc<AddressFlowEvent, AddressFlowState> {
     return addressesJson.map((json) => Address.fromJson(jsonDecode(json))).toList();
   }
 
-  void updateAddressType(String type) {
-    emit(state.copyWith(addressType: type));
-    validateForm();
-  }
-
-  void updateCustomType(String type) {
-    emit(state.copyWith(customAddressType: type));
-    validateForm();
-  }
-
-  void validateForm() {
-    emit(state.copyWith(isFormValid: _validateFormFields()));
-  }
-
   @override
   Future<void> close() {
-    _houseNoController.dispose();
-    _floorNoController.dispose();
-    _buildingController.dispose();
-    _streetController.dispose();
-    _areaController.dispose();
-    _cityController.dispose();
-    _stateController.dispose();
-    _pincodeController.dispose();
-    _customTypeController.dispose();
     _mapController.dispose();
     return super.close();
   }
@@ -515,22 +490,21 @@ class AddressSelectionStep extends StatelessWidget {
                   style: MyTextStyle.f16(greyColor),
                 ),
                 const SizedBox(height: 24),
-                if (!state.hasReachedLimit)
-                  ElevatedButton(
-                    onPressed: () => bloc.add(ChangeStepEvent(1)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: appPrimaryColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 24, vertical: 12),
+                ElevatedButton(
+                  onPressed: () => bloc.add(ChangeStepEvent(1)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: appPrimaryColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Text(
-                      "+ Add new Address",
-                      style: MyTextStyle.f16(whiteColor),
-                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
                   ),
+                  child: Text(
+                    "+ Add new Address",
+                    style: MyTextStyle.f16(whiteColor),
+                  ),
+                ),
               ],
             ),
           )
@@ -542,7 +516,10 @@ class AddressSelectionStep extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
                   leading: const Icon(Icons.location_on, color: appPrimaryColor),
-                  title: Text(address.title, style: MyTextStyle.f16(textColorDark, weight: FontWeight.w600)),
+                  title: Text(
+                    address.title,
+                    style: MyTextStyle.f16(textColorDark, weight: FontWeight.w600),
+                  ),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -566,7 +543,7 @@ class AddressSelectionStep extends StatelessWidget {
                           style: MyTextStyle.f14(textColorDark),
                         ),
                       Text(
-                        '${address.city}, ${address.state} - ${address.pincode}',
+                        '${address.city}, ${address.state} ${address.pincode}',
                         style: MyTextStyle.f14(greyColor),
                       ),
                     ],
@@ -583,27 +560,30 @@ class AddressSelectionStep extends StatelessWidget {
             },
           ),
         ),
-        if (!state.hasReachedLimit && state.addresses.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => bloc.add(ChangeStepEvent(1)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: appPrimaryColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: state.hasReachedLimit
+                  ? null
+                  : () => bloc.add(ChangeStepEvent(1)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: state.hasReachedLimit ? greyColor : appPrimaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: Text(
-                  "+ Add new Address",
-                  style: MyTextStyle.f18(whiteColor, weight: FontWeight.bold),
-                ),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+              child: Text(
+                state.hasReachedLimit
+                    ? "Maximum addresses reached (10)"
+                    : "+ Add new Address",
+                style: MyTextStyle.f18(whiteColor, weight: FontWeight.bold),
               ),
             ),
           ),
+        ),
       ],
     );
   }
@@ -634,24 +614,38 @@ class MapSelectionStep extends StatelessWidget {
               );
 
               String displayAddress = "";
+              String pincode = "";
+              String city = "Tirunelveli";
+              String stateName = "Tamil Nadu";
+
               if (placemarks.isNotEmpty) {
                 final place = placemarks.first;
                 displayAddress = [
                   place.street,
                   place.subLocality,
                 ].where((part) => part != null && part!.isNotEmpty).join(", ");
+
+                pincode = place.postalCode ?? "";
+                city = place.locality ?? "Tirunelveli";
+                stateName = place.administrativeArea ?? "Tamil Nadu";
               }
 
               bloc.add(SelectLocationEvent(
                 location,
                 "Selected Location (${location.latitude.toStringAsFixed(4)}, ${location.longitude.toStringAsFixed(4)})",
                 displayAddress.isNotEmpty ? displayAddress : "Selected Location",
+                pincode,
+                city,
+                stateName,
               ));
             } catch (e) {
               bloc.add(SelectLocationEvent(
                 location,
                 "Selected Location (${location.latitude.toStringAsFixed(4)}, ${location.longitude.toStringAsFixed(4)})",
                 "Selected Location",
+                "",
+                "Tirunelveli",
+                "Tamil Nadu",
               ));
             }
           },
@@ -717,10 +711,11 @@ class MapSelectionStep extends StatelessWidget {
                   style: MyTextStyle.f16(textColorDark),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  "Selected Location",
-                  style: MyTextStyle.f14(greyColor),
-                ),
+                if (state.selectedPincode?.isNotEmpty ?? false)
+                  Text(
+                    "Pincode: ${state.selectedPincode}",
+                    style: MyTextStyle.f14(greyColor),
+                  ),
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
@@ -761,8 +756,42 @@ class AddressDetailsStep extends StatefulWidget {
 }
 
 class _AddressDetailsStepState extends State<AddressDetailsStep> {
+  final _houseNoController = TextEditingController();
+  final _floorNoController = TextEditingController();
+  final _buildingController = TextEditingController();
+  final _streetController = TextEditingController();
+  final _areaController = TextEditingController();
+  final _customTypeController = TextEditingController();
+  String _addressType = "HOME";
   String? _floorNumberError;
-  String? _pincodeError;
+  bool _isFormValid = false;
+
+  @override
+  void dispose() {
+    _houseNoController.dispose();
+    _floorNoController.dispose();
+    _buildingController.dispose();
+    _streetController.dispose();
+    _areaController.dispose();
+    _customTypeController.dispose();
+    super.dispose();
+  }
+
+  bool _validateFloorNumber(String value) {
+    return RegExp(r'^[0-9A-Za-z\- ]+$').hasMatch(value);
+  }
+
+  void _validateForm() {
+    setState(() {
+      _floorNumberError = _validateFloorNumber(_floorNoController.text)
+          ? null
+          : "Only alphanumeric characters and hyphens allowed";
+
+      _isFormValid = _houseNoController.text.isNotEmpty &&
+          _floorNoController.text.isNotEmpty &&
+          _floorNumberError == null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -789,9 +818,9 @@ class _AddressDetailsStepState extends State<AddressDetailsStep> {
 
           // House/Flat Number (Required)
           CustomTextField(
-            controller: bloc._houseNoController,
+            controller: _houseNoController,
             hint: "House / Flat no *",
-            onChanged: (value) => bloc.validateForm(),
+            onChanged: (value) => _validateForm(),
           ),
           const SizedBox(height: 16),
 
@@ -800,15 +829,10 @@ class _AddressDetailsStepState extends State<AddressDetailsStep> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CustomTextField(
-                controller: bloc._floorNoController,
+                controller: _floorNoController,
                 hint: "Floor number *",
                 onChanged: (value) {
-                  setState(() {
-                    _floorNumberError = bloc._validateFloorNumber(value)
-                        ? null
-                        : "Only alphanumeric characters and hyphens allowed";
-                  });
-                  bloc.validateForm();
+                  _validateForm();
                 },
               ),
               if (_floorNumberError != null)
@@ -825,51 +849,42 @@ class _AddressDetailsStepState extends State<AddressDetailsStep> {
 
           // Building/Apartment Name (Optional)
           CustomTextField(
-            controller: bloc._buildingController,
+            controller: _buildingController,
             hint: "Apartment / Building name (Optional)",
           ),
           const SizedBox(height: 16),
 
           // Street (Optional)
           CustomTextField(
-            controller: bloc._streetController,
+            controller: _streetController,
             hint: "Street (Optional)",
           ),
           const SizedBox(height: 16),
 
           // Area (Optional)
           CustomTextField(
-            controller: bloc._areaController,
+            controller: _areaController,
             hint: "Area/Locality (Optional)",
           ),
           const SizedBox(height: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CustomTextField(
-                controller: bloc._pincodeController,
-                hint: "Pincode *",
-                keyboardType: TextInputType.number,
-                maxLength: 6,
-                onChanged: (value) {
-                  setState(() {
-                    _pincodeError = bloc._validatePincode(value)
-                        ? null
-                        : "Enter a valid 6-digit pincode";
-                  });
-                  bloc.validateForm();
-                },
-              ),
-              if (_pincodeError != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 4.0),
-                  child: Text(
-                    _pincodeError!,
-                    style: MyTextStyle.f12(redColor),
-                  ),
+
+          // Pincode (Display only)
+          if (state.selectedPincode?.isNotEmpty ?? false)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Pincode",
+                  style: MyTextStyle.f14(greyColor),
                 ),
-            ],
-          ),
+                const SizedBox(height: 4),
+                Text(
+                  state.selectedPincode!,
+                  style: MyTextStyle.f16(textColorDark),
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
 
           // Address Type Selection
           const SizedBox(height: 16),
@@ -882,11 +897,15 @@ class _AddressDetailsStepState extends State<AddressDetailsStep> {
             children: [
               Expanded(
                 child: ChoiceChip(
-                  label: Text("HOME", style: MyTextStyle.f14(
-                      state.addressType == "HOME" ? whiteColor : textColorDark)),
-                  selected: state.addressType == "HOME",
+                  label: Text(
+                    "HOME",
+                    style: MyTextStyle.f14(_addressType == "HOME" ? whiteColor : textColorDark),
+                  ),
+                  selected: _addressType == "HOME",
                   onSelected: (selected) {
-                    bloc.updateAddressType("HOME");
+                    setState(() {
+                      _addressType = "HOME";
+                    });
                   },
                   selectedColor: appPrimaryColor,
                   backgroundColor: greyShade300,
@@ -895,11 +914,15 @@ class _AddressDetailsStepState extends State<AddressDetailsStep> {
               const SizedBox(width: 8),
               Expanded(
                 child: ChoiceChip(
-                  label: Text("OFFICE", style: MyTextStyle.f14(
-                      state.addressType == "OFFICE" ? whiteColor : textColorDark)),
-                  selected: state.addressType == "OFFICE",
+                  label: Text(
+                    "OFFICE",
+                    style: MyTextStyle.f14(_addressType == "OFFICE" ? whiteColor : textColorDark),
+                  ),
+                  selected: _addressType == "OFFICE",
                   onSelected: (selected) {
-                    bloc.updateAddressType("OFFICE");
+                    setState(() {
+                      _addressType = "OFFICE";
+                    });
                   },
                   selectedColor: appPrimaryColor,
                   backgroundColor: greyShade300,
@@ -908,11 +931,15 @@ class _AddressDetailsStepState extends State<AddressDetailsStep> {
               const SizedBox(width: 8),
               Expanded(
                 child: ChoiceChip(
-                  label: Text("OTHERS", style: MyTextStyle.f14(
-                      state.addressType == "OTHERS" ? whiteColor : textColorDark)),
-                  selected: state.addressType == "OTHERS",
+                  label: Text(
+                    "OTHERS",
+                    style: MyTextStyle.f14(_addressType == "OTHERS" ? whiteColor : textColorDark),
+                  ),
+                  selected: _addressType == "OTHERS",
                   onSelected: (selected) {
-                    bloc.updateAddressType("OTHERS");
+                    setState(() {
+                      _addressType = "OTHERS";
+                    });
                   },
                   selectedColor: appPrimaryColor,
                   backgroundColor: greyShade300,
@@ -921,38 +948,46 @@ class _AddressDetailsStepState extends State<AddressDetailsStep> {
             ],
           ),
 
-          if (state.addressType == "OTHERS") ...[
+          if (_addressType == "OTHERS") ...[
             const SizedBox(height: 16),
             CustomTextField(
-              controller: bloc._customTypeController,
+              controller: _customTypeController,
               hint: "Enter address type (e.g., Friend's place) (Optional)",
             ),
           ],
           const SizedBox(height: 32),
 
           // Add Address Button
-          if (!state.hasReachedLimit)
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: state.isFormValid
-                    ? () => bloc.add(AddAddressEvent(context))
-                    : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: state.isFormValid
-                      ? appPrimaryColor
-                      : greyColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _isFormValid
+                  ? () => bloc.add(AddAddressEvent(
+                context,
+                _houseNoController.text,
+                _floorNoController.text,
+                _buildingController.text.isNotEmpty ? _buildingController.text : null,
+                _streetController.text.isNotEmpty ? _streetController.text : null,
+                _areaController.text.isNotEmpty ? _areaController.text : null,
+                _addressType,
+                _addressType == "OTHERS" ? _customTypeController.text : null,
+              ))
+                  : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _isFormValid
+                    ? appPrimaryColor
+                    : greyColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: Text(
-                  "Add Address",
-                  style: MyTextStyle.f18(whiteColor, weight: FontWeight.bold),
-                ),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+              child: Text(
+                "Add Address",
+                style: MyTextStyle.f18(whiteColor, weight: FontWeight.bold),
               ),
             ),
+          ),
         ],
       ),
     );

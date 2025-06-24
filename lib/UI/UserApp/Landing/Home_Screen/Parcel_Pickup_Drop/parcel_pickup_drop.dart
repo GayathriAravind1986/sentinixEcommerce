@@ -574,7 +574,6 @@ class _PickupDropViewState extends State<PickupDropView> {
                     : null,
               ),
               const SizedBox(height: 12),
-
               CustomTextField(
                 hint: "Special Instructions (Optional)",
                 controller: _instructionController,
@@ -582,7 +581,7 @@ class _PickupDropViewState extends State<PickupDropView> {
                 validator: (val) => null, // Optional field
               ),
               const SizedBox(height: 12),
-              VoiceRecorderTextField(controller: _instructionController),
+              VoiceRecorderBox(),
               const SizedBox(height: 12),
               AlternativePhoneField(
                 controller: _altPhoneController,

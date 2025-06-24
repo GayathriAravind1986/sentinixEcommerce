@@ -22,6 +22,6 @@ class Images {
   static const String banner_3 = 'assets/image/caroseal_3.jpg';
   static const String banner_4 = 'assets/image/caroseal_4.jpg';
   static const String parcel = 'assets/image/parcel_pickup.png';
-  static const String person = 'assets/image/person_1.png';
+  static const String person = 'assets/image/person.jpeg';
   static const String profile = 'assets/image/profile.png';
 }

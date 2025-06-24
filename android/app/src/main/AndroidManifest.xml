@@ -14,10 +14,12 @@
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
     <application
         android:label="pro deliverz"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
         <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyAS30iPsbnEuwVMRiJMoqu_gfVROqvUabw" />
         <activity
             android:name=".MainActivity"

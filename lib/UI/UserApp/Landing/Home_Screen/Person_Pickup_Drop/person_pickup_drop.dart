@@ -53,6 +53,7 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
   String? _selectedVehicle;
   late Timer _timer;
   LatLng? _selectedPosition;
+  File? _voiceNote;
   bool _isSelectingPickup = true;
   int _currentLocationIndex = 0;
 
@@ -508,7 +509,7 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
                 validator: (val) => null, // Optional field
               ),
               const SizedBox(height: 12),
-              VoiceRecorderTextField(controller: _instructionController),
+              VoiceRecorderBox(),
               const SizedBox(height: 12),
               AlternativePhoneField(
                 controller: _altPhoneController,
