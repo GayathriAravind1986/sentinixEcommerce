@@ -51,7 +51,7 @@ class _SplashScreenState extends State<SplashScreen>
     //       ))
     //      :
     Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(builder: (context) => const LoginCustomer()),
             (Route<dynamic> route) => false);
     // }
   }
