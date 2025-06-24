@@ -61,6 +61,7 @@ dependencies:
   just_audio: ^0.9.36
   audio_session: ^0.1.14
   geolocator: ^10.0.0
+  audioplayers: ^5.2.1
 
 
 

@@ -1,24 +1,25 @@
-import 'dart:async';
+import 'dart:async'; // Add this for Timer
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:audio_session/audio_session.dart';
 import 'package:another_audio_recorder/another_audio_recorder.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class VoiceRecorderTextField extends StatefulWidget {
   final TextEditingController controller;
-  final InputDecoration? decoration;
-  final int maxLines;
-  final int? maxLength;
+  final ValueChanged<File?>? onRecordingComplete;
+  final double height;
+  final double iconSize;
+  final EdgeInsetsGeometry? padding;
 
   const VoiceRecorderTextField({
     super.key,
     required this.controller,
-    this.decoration,
-    this.maxLines = 1,
-    this.maxLength,
+    this.onRecordingComplete,
+    this.height = 45,
+    this.iconSize = 20,
+    this.padding,
   });
 
   @override
@@ -26,178 +27,285 @@ class VoiceRecorderTextField extends StatefulWidget {
 }
 
 class _VoiceRecorderTextFieldState extends State<VoiceRecorderTextField> {
-  AnotherAudioRecorder? _recorder;
   bool _isRecording = false;
-  File? _recordedFile;
-  bool _isVoiceRecorded = false;
-  final _player = AudioPlayer();
+  bool _isPlaying = false;
+  File? _audioFile;
+  AnotherAudioRecorder? _recorder;
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  Duration? _recordingDuration;
+  Duration? _playbackPosition;
+  Timer? _recordingTimer;
 
   @override
   void initState() {
     super.initState();
-    _setupAudioSession();
-  }
-
-  Future<void> _setupAudioSession() async {
-    final session = await AudioSession.instance;
-    await session.configure(const AudioSessionConfiguration.speech());
-  }
-
-  Future<void> _checkAndRequestPermission() async {
-    final status = await Permission.microphone.status;
-    if (status.isGranted) {
-      _startRecording();
-    } else if (status.isDenied || status.isRestricted || status.isLimited) {
-      _showPermissionDialog();
-    } else if (status.isPermanentlyDenied) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Microphone permission permanently denied. Open settings.')),
-      );
-      openAppSettings();
-    }
-  }
-
-  void _showPermissionDialog() {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Microphone Permission'),
-        content: const Text('This app needs access to your microphone to record audio.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Deny'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(context).pop();
-              final status = await Permission.microphone.request();
-              if (status.isGranted) {
-                _startRecording();
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('❌ Microphone permission denied')),
-                );
-              }
-            },
-            child: const Text('Allow'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _startRecording() async {
-    final dir = await getApplicationDocumentsDirectory();
-    final path = '${dir.path}/voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
-
-    _recorder = AnotherAudioRecorder(path, audioFormat: AudioFormat.AAC);
-    await _recorder!.initialized;
-    await _recorder!.start();
-
-    setState(() {
-      _isRecording = true;
+    _audioPlayer.onPlayerComplete.listen((_) {
+      setState(() => _isPlaying = false);
+    });
+    _audioPlayer.onPositionChanged.listen((position) {
+      setState(() => _playbackPosition = position);
     });
   }
 
-  Future<void> _stopRecording() async {
-    if (_recorder != null && _isRecording) {
-      final result = await _recorder!.stop();
-      final path = result?.path;
-      if (path != null) {
-        final file = File(path);
-        if (await file.exists()) {
-          setState(() {
-            _recordedFile = file;
-            _isVoiceRecorded = true;
-          });
-          widget.controller.clear();
+  @override
+  void dispose() {
+    _stopRecording(); // Properly stop recording if active
+    _audioPlayer.dispose();
+    _recordingTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<bool> _checkPermissions() async {
+    if (Platform.isAndroid || Platform.isIOS) {
+      final status = await Permission.microphone.request();
+      if (!status.isGranted) {
+        if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('🎧 Voice recorded: ${file.path.split("/").last}')),
+            const SnackBar(content: Text("Microphone permission denied")),
           );
+        }
+        return false;
+      }
+
+      if (Platform.isAndroid) {
+        final storageStatus = await Permission.manageExternalStorage.request();
+        if (!storageStatus.isGranted) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Storage permission denied")),
+            );
+          }
+          return false;
         }
       }
     }
-    setState(() => _isRecording = false);
+    return true;
   }
 
-  Future<void> _playRecording() async {
-    if (_recordedFile != null) {
-      try {
-        print("Trying to play: ${_recordedFile!.path}");
-        print("Exists: ${_recordedFile!.existsSync()}");
-        print("Size: ${_recordedFile!.lengthSync()} bytes");
+  Future<void> _startRecording() async {
+    if (!await _checkPermissions()) return;
 
-        await _player.setFilePath(_recordedFile!.path);
-        await _player.play();
-      } catch (e) {
-        debugPrint('Error playing recording: $e');
+    try {
+      final dir = await getTemporaryDirectory();
+      final filePath = '${dir.path}/voice_${DateTime.now().millisecondsSinceEpoch}.wav';
+
+      _recorder = AnotherAudioRecorder(filePath, audioFormat: AudioFormat.WAV);
+      final recording = await _recorder?.start();
+      if (recording == null) {
+        throw Exception("Failed to initialize recorder");
+      }
+
+      // Start recording timer
+      _recordingDuration = Duration.zero;
+      _recordingTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (mounted) {
+          setState(() {
+            _recordingDuration = Duration(seconds: timer.tick);
+          });
+        }
+      });
+
+      if (mounted) {
+        setState(() {
+          _isRecording = true;
+          _audioFile = null;
+          widget.controller.clear();
+        });
+      }
+    } catch (e) {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Playback error: $e')),
+          SnackBar(content: Text("Recording failed: ${e.toString()}")),
         );
       }
     }
   }
 
-  @override
-  void dispose() {
-    _player.dispose();
-    super.dispose();
+  Future<void> _stopRecording() async {
+    _recordingTimer?.cancel();
+    if (_recorder == null) return;
+
+    try {
+      final result = await _recorder?.stop();
+      if (result?.path == null) return;
+
+      final recordedFile = File(result!.path!);
+      if (recordedFile.existsSync() && recordedFile.lengthSync() > 0) {
+        if (mounted) {
+          setState(() {
+            _audioFile = recordedFile;
+            _isRecording = false;
+            _playbackPosition = null;
+          });
+        }
+        widget.onRecordingComplete?.call(_audioFile);
+      } else {
+        recordedFile.deleteSync();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Recording failed - empty file")),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Stop recording failed: ${e.toString()}")),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isRecording = false);
+      }
+    }
+  }
+
+  void _deleteAudio() {
+    _audioFile?.deleteSync();
+    if (mounted) {
+      setState(() {
+        _audioFile = null;
+        _playbackPosition = null;
+      });
+    }
+    widget.onRecordingComplete?.call(null);
+  }
+
+  Future<void> _playAudio() async {
+    if (_audioFile == null || !_audioFile!.existsSync()) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("No voice file found to play.")),
+        );
+      }
+      return;
+    }
+
+    try {
+      if (mounted) {
+        setState(() => _isPlaying = true);
+      }
+      await _audioPlayer.play(DeviceFileSource(_audioFile!.path));
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isPlaying = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Playback error: ${e.toString()}")),
+        );
+      }
+    }
+  }
+
+  Future<void> _pauseAudio() async {
+    try {
+      await _audioPlayer.pause();
+      if (mounted) {
+        setState(() => _isPlaying = false);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Pause error: ${e.toString()}")),
+        );
+      }
+    }
+  }
+
+  String _formatDuration(Duration? duration) {
+    if (duration == null) return '00:00';
+    final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: widget.controller,
-                enabled: !_isVoiceRecorded,
-                decoration: widget.decoration ??
-                    const InputDecoration(
-                      hintText: 'Special Instructions (Optional)',
-                      border: OutlineInputBorder(),
-                    ),
-                maxLines: widget.maxLines,
-                maxLength: widget.maxLength,
-              ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Container(
+            height: widget.height,
+            margin: const EdgeInsets.symmetric(horizontal: 0),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.shade300, width: 1.5),
+              borderRadius: BorderRadius.circular(10),
             ),
-            const SizedBox(width: 10),
-            Listener(
-              onPointerDown: (_) => _checkAndRequestPermission(),
-              onPointerUp: (_) => _stopRecording(),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: _isRecording ? Colors.red.withOpacity(0.2) : Colors.transparent,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.mic,
-                  color: _isRecording ? Colors.red : Colors.teal,
-                  size: _isRecording ? 32 : 28,
-                ),
-              ),
-            ),
-          ],
-        ),
-        if (_recordedFile != null) ...[
-          const SizedBox(height: 8),
-          GestureDetector(
-            onTap: _playRecording,
+            padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 12),
             child: Row(
-              children: const [
-                Icon(Icons.play_arrow, color: Colors.teal),
-                SizedBox(width: 4),
-                Text("Play Recorded Voice"),
+              children: [
+                // Record/Stop button
+                GestureDetector(
+                  onTap: _isRecording ? _stopRecording : _startRecording,
+                  child: Icon(
+                    _isRecording ? Icons.stop : Icons.mic,
+                    size: widget.iconSize,
+                    color: _isRecording ? Colors.red : Colors.grey.shade700,
+                  ),
+                ),
+                const SizedBox(width: 12),
+
+                // Status text and duration
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _audioFile != null
+                            ? "Voice message"
+                            : _isRecording
+                            ? "Recording..."
+                            : "Tap mic to record",
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: (_isRecording || _audioFile != null)
+                              ? Colors.black87
+                              : Colors.grey,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (_isRecording || _audioFile != null)
+                        Text(
+                          _isRecording
+                              ? _formatDuration(_recordingDuration)
+                              : _formatDuration(_playbackPosition ??
+                              Duration(milliseconds: _audioFile?.lengthSync() ?? 0)),
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+
+                // Playback controls
+                if (_audioFile != null) ...[
+                  IconButton(
+                    icon: Icon(
+                      _isPlaying ? Icons.pause : Icons.play_arrow,
+                      color: Colors.green,
+                    ),
+                    onPressed: _isPlaying ? _pauseAudio : _playAudio,
+                    iconSize: widget.iconSize,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: _deleteAudio,
+                    iconSize: widget.iconSize,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
               ],
             ),
           ),
-        ]
+        ),
+        const SizedBox(width: 10),
       ],
     );
   }

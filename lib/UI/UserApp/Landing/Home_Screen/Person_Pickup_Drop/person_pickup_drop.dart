@@ -11,7 +11,6 @@ import 'package:sentinix_ecommerce/Bloc/demo/demo_bloc.dart';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/Reusable/customTextfield.dart';
 import 'package:sentinix_ecommerce/Reusable/custom_phone_field.dart';
-import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/Reusable/VoiceRecorder.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Navigation_Bar/Navigation_bar.dart';
@@ -497,42 +496,40 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
               CustomTextField(
                 hint: "Package Details",
                 controller: _packageController,
-                maxLine: 2,
                 validator: (val) => val == null || val.trim().isEmpty
                     ? "Enter package details"
                     : null,
               ),
               const SizedBox(height: 12),
-              VoiceRecorderTextField(
+              CustomTextField(
+                hint: "Special Instructions (Optional)",
                 controller: _instructionController,
-                maxLines: 2,
                 maxLength: 200,
-                decoration: InputDecoration(
-                  labelText: "Special Instructions (Optional)",
-                  hintStyle: TextStyle(color: Colors.grey),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.orange, width: 2),
-                  ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                validator: (val) => null, // Optional field
+              ),
+              const SizedBox(height: 12),
+              VoiceRecorderTextField(controller: _instructionController),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.only(left: 20, right: 20), // force spacing
+                alignment: Alignment.center,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: 60,
+                        child: CustomPhoneField(
+                          controller: _altPhoneController,
+                          onPhoneChanged: (phoneNumber) {
+                            print("Phone number changed: $phoneNumber");
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
-              const SizedBox(height: 12),
-              CustomPhoneField(
-                controller: _altPhoneController,
-                onPhoneChanged: (phoneNumber) {
-                  print("Phone number changed: $phoneNumber");
-                },
-              ),
 
               const SizedBox(height: 16),
               MediaPreviewWidget(

@@ -51,8 +51,8 @@ class _SplashScreenState extends State<SplashScreen>
     //       ))
     //      :
     Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const LoginCustomer()),
-        (Route<dynamic> route) => false);
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+            (Route<dynamic> route) => false);
     // }
   }
 
@@ -72,31 +72,31 @@ class _SplashScreenState extends State<SplashScreen>
             ),
             Center(
                 child: AnimatedBuilder(
-              animation: _controller,
-              child: Container(
-                // width: 10,
-                // height: 10,
-                color: Colors.transparent,
-                child: Center(
-                  child: Image.asset(
-                    height: 50,
-                    width: 50,
-                    Images.splashLogo,
-                    fit: BoxFit.contain,
+                  animation: _controller,
+                  child: Container(
+                    // width: 10,
+                    // height: 10,
+                    color: Colors.transparent,
+                    child: Center(
+                      child: Image.asset(
+                        height: 50,
+                        width: 50,
+                        Images.splashLogo,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              builder: (BuildContext context, Widget? child) {
-                return Transform.scale(
-                  scale: _animation.value,
-                  child: Transform.rotate(
-                    origin: Offset.zero,
-                    angle: _controller.value * 8,
-                    child: child,
-                  ),
-                );
-              },
-            )),
+                  builder: (BuildContext context, Widget? child) {
+                    return Transform.scale(
+                      scale: _animation.value,
+                      child: Transform.rotate(
+                        origin: Offset.zero,
+                        angle: _controller.value * 8,
+                        child: child,
+                      ),
+                    );
+                  },
+                )),
           ],
         ));
   }
@@ -107,7 +107,8 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
 
     _controller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 2000));
+        vsync: this,
+        duration: const Duration(milliseconds: 2000));
     _animation = Tween<double>(
       begin: 500,
       end: 0,

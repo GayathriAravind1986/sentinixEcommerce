@@ -570,41 +570,44 @@ class _PickupDropViewState extends State<PickupDropView> {
               CustomTextField(
                 hint: "Package Details",
                 controller: _packageController,
-                maxLine: 2,
                 validator: (val) => val == null || val.trim().isEmpty
                     ? "Enter package details"
                     : null,
               ),
               const SizedBox(height: 12),
-              VoiceRecorderTextField(
+
+              CustomTextField(
+                hint: "Special Instructions (Optional)",
                 controller: _instructionController,
-                maxLines: 2,
                 maxLength: 200,
-                decoration: InputDecoration(
-                  labelText: "Special Instructions (Optional)",
-                  hintStyle: TextStyle(color: Colors.grey),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.orange, width: 2),
-                  ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                ),
+                validator: (val) => null, // Optional field
               ),
               const SizedBox(height: 12),
-              CustomPhoneField(
-                controller: _altPhoneController,
-                onPhoneChanged: (phoneNumber) {
-                  print("Phone number changed: $phoneNumber");
-                },
+              VoiceRecorderTextField(controller: _instructionController),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.only(left: 20, right: 20), // force spacing
+                alignment: Alignment.center,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: 60,
+                        child: CustomPhoneField(
+                          controller: _altPhoneController,
+                          onPhoneChanged: (phoneNumber) {
+                            print("Phone number changed: $phoneNumber");
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
+
+
+
+
               const SizedBox(height: 16),
               MediaPreviewWidget(
                 mediaFiles: _mediaFiles,
