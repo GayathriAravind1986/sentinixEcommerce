@@ -601,7 +601,6 @@ class _PickupDropViewState extends State<PickupDropView> {
               const SizedBox(height: 12),
               CustomPhoneField(
                 controller: _altPhoneController,
-
                 onPhoneChanged: (phoneNumber) {
                   print("Phone number changed: $phoneNumber");
                 },
