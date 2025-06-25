@@ -432,6 +432,11 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
   @override
   Widget build(BuildContext context) {
     Widget mainContainer() {
+      const EdgeInsetsGeometry fieldHorizontalPadding = EdgeInsets.symmetric(horizontal: 8.0); // Example: adjust as needed for text fields
+
+      const EdgeInsetsGeometry micHorizontalPadding = EdgeInsets.symmetric(horizontal: 0.0); // Example: adjust as needed for mic box
+
+
       return SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -454,7 +459,9 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
               ),
               const SizedBox(height: 24),
               if (_pickupType == 1)
-                LocationFields(
+                Padding(
+                  padding: fieldHorizontalPadding,
+                child: LocationFields(
                   label: "Pickup Location",
                   controllers: _pickupControllers,
                   showAddRemove: _pickupType == 1,
@@ -473,9 +480,12 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
                     }
                   },
                     onTap: (index) => selectAddress(true, index),
+                ),
                 )
               else
-                LocationFields(
+                Padding(
+                padding: fieldHorizontalPadding,
+                child: LocationFields(
                   label: "Pickup Location",
                   controllers: [_pickupControllers[0]],
                   showAddRemove: false,
@@ -483,8 +493,11 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
                   onRemove: () {},
                     onTap: (index) => selectAddress(true, index),
                 ),
+                ),
               const SizedBox(height: 12),
-              LocationFields(
+              Padding(
+                 padding: fieldHorizontalPadding,
+                 child: LocationFields(
                 label: "Drop Location",
                 controllers: [_dropControllers[0]],
                 showAddRemove: false,
@@ -493,39 +506,52 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
                 onTap: (index) => selectAddress(false, index),
 
               ),
+              ),
               const SizedBox(height: 12),
-              CustomTextField(
+               Padding(
+                padding: fieldHorizontalPadding,
+                child:CustomTextField(
                 hint: "Package Details",
                 controller: _packageController,
                 validator: (val) => val == null || val.trim().isEmpty
                     ? "Enter package details"
                     : null,
               ),
+               ),
               const SizedBox(height: 12),
-              CustomTextField(
+               Padding(
+                 padding: fieldHorizontalPadding,
+                 child:CustomTextField(
                 hint: "Special Instructions (Optional)",
                 controller: _instructionController,
                 maxLength: 200,
                 validator: (val) => null, // Optional field
               ),
+               ),
               const SizedBox(height: 12),
-              VoiceRecorderBox(),
+               Padding(
+                 padding: micHorizontalPadding, // <<< UNIQUE PADDING HERE
+                 child: VoiceRecorderBox(),
+               ),
               const SizedBox(height: 12),
-              AlternativePhoneField(
+               Padding(
+                padding: fieldHorizontalPadding,
+                child: AlternativePhoneField(
                 controller: _altPhoneController,
                 onPhoneChanged: (val) {
                   print("Alt Phone: $val");
                 },
               ),
-
-
-
+               ),
               const SizedBox(height: 16),
-              MediaPreviewWidget(
+               Padding(
+                padding: fieldHorizontalPadding,
+                child: MediaPreviewWidget(
                 mediaFiles: _mediaFiles,
                 onAddMedia: _showMediaPicker,
                 onRemoveMedia: (index) => _removeMedia(index),
               ),
+               ),
               const SizedBox(height: 24),
               SubmitButton(
                 formKey: _formKey,

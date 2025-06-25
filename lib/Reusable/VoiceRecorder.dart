@@ -103,20 +103,25 @@ class _VoiceRecorderBoxState extends State<VoiceRecorderBox> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.9,
+      // Keep width as per original, assuming it's part of the design
+      width: MediaQuery.of(context).size.width * 0.85,
       height: 45,
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey.shade300),
         borderRadius: BorderRadius.circular(15), // Rounded corners like the image
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      // Crucial change for alignment: Adjusted horizontal padding
+      // This padding, combined with the mic button's padding, should
+      // align the "Tap mic to record" text with the input text of other fields.
+      padding: const EdgeInsets.symmetric(horizontal: 4.0), // Reduced from 16 to 4
       child: Row(
         children: [
           // Microphone button - toggle on tap
           GestureDetector(
             onTap: _toggleRecording,
             child: Container(
-              padding: const EdgeInsets.all(8),
+              // Mic icon container padding also reduced/adjusted if necessary
+              padding: const EdgeInsets.all(8), // Keep this as it styles the button itself
               decoration: BoxDecoration(
                 color: _isRecording ? Colors.red.withOpacity(0.1) : Colors.transparent,
                 shape: BoxShape.circle,

@@ -50,7 +50,8 @@ class _AlternativePhoneFieldState extends State<AlternativePhoneField> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: 6, right: 6, top: 6, bottom: 6), // Keeping original margins
+      width: MediaQuery.of(context).size.width * 0.85,
+      height: 70, // Keeping original margins
       child: IntlPhoneField(
         focusNode: _focusNode,
         controller: widget.controller,

@@ -92,8 +92,8 @@ class MediaPreviewWidget extends StatelessWidget {
                 GestureDetector(
                   onTap: onAddMedia,
                   child: Container(
-                    width: 120,
-                    height: 120,
+                    width: 100,
+                    height: 100,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: appPrimaryColor),
