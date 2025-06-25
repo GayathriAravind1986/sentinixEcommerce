@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 
 class LocationPickerScreen extends StatefulWidget {
@@ -101,12 +100,12 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                     onPressed: _pickedLocation == null
                         ? null
                         : () {
-                      // Return the selected location
-                      Navigator.pop(context, {
-                        'location': _pickedLocation,
-                        'address': _pickedAddress,
-                      });
-                    },
+                            // Return the selected location
+                            Navigator.pop(context, {
+                              'location': _pickedLocation,
+                              'address': _pickedAddress,
+                            });
+                          },
                     child: const Text("Confirm Location"),
                   ),
                 ],
