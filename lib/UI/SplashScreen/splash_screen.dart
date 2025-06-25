@@ -13,115 +13,46 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with TickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation _animation;
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
+class _SplashScreenState extends State<SplashScreen> {
   dynamic userId;
   dynamic roleId;
 
-  getToken() async {
+  Future<void> getToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       userId = prefs.getString("userId");
       roleId = prefs.getString("roleId");
     });
-    debugPrint("SplashUserId:$userId");
-    debugPrint("SplashRoleId:$roleId");
-  }
-
-  callApis() async {
-    await getToken();
+    debugPrint("SplashUserId: $userId");
+    debugPrint("SplashRoleId: $roleId");
   }
 
   void onTimerFinished() {
-    // if (mounted) {
-    //   userId == null || roleId == null
-    //       ? Navigator.pushReplacement(
-    //       context,
-    //       MaterialPageRoute(
-    //         builder: (context) => const LoginScreen(),
-    //       ))
-    //      :
     Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const LoginCustomer()),
-            (Route<dynamic> route) => false);
-    // }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
-    return Scaffold(
-        backgroundColor: whiteColor,
-        body: Stack(
-          children: [
-            Container(
-              height: size.height,
-              width: size.width,
-              decoration: const BoxDecoration(
-                color: whiteColor,
-              ),
-            ),
-            Center(
-                child: AnimatedBuilder(
-                  animation: _controller,
-                  child: Container(
-                    // width: 10,
-                    // height: 10,
-                    color: Colors.transparent,
-                    child: Center(
-                      child: Image.asset(
-                        height: 50,
-                        width: 50,
-                        Images.splashLogo,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                  builder: (BuildContext context, Widget? child) {
-                    return Transform.scale(
-                      scale: _animation.value,
-                      child: Transform.rotate(
-                        origin: Offset.zero,
-                        angle: _controller.value * 8,
-                        child: child,
-                      ),
-                    );
-                  },
-                )),
-          ],
-        ));
+      MaterialPageRoute(builder: (context) => const LoginCustomer()),
+          (Route<dynamic> route) => false,
+    );
   }
 
   @override
   void initState() {
-    // callApis();
     super.initState();
+    getToken();
+    Timer(const Duration(seconds: 5), () => onTimerFinished());
+  }
 
-    _controller = AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 2000));
-    _animation = Tween<double>(
-      begin: 500,
-      end: 0,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.ease,
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: whiteColor,
+      body: Center(
+        child: Image.asset(
+          Images.splashLogo,
+          width: MediaQuery.of(context).size.width * 0.8,
+          height: MediaQuery.of(context).size.height * 0.4,
+          fit: BoxFit.contain,
+        ),
       ),
     );
-    _controller.forward();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Timer(const Duration(seconds: 2), () => onTimerFinished());
-    });
   }
 }

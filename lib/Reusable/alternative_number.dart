@@ -21,7 +21,7 @@ class AlternativePhoneField extends StatefulWidget {
 class _AlternativePhoneFieldState extends State<AlternativePhoneField> {
   List<TextInputFormatter> formatters = [LengthLimitingTextInputFormatter(10)];
   final FocusNode _focusNode = FocusNode();
-  Color borderColor = Colors.grey.withOpacity(0.5); // Keeping original color
+  Color borderColor = Colors.grey.withOpacity(0.5);
 
   final Map<String, int> countryMaxLengths = {
     'IN': 10,
@@ -36,7 +36,9 @@ class _AlternativePhoneFieldState extends State<AlternativePhoneField> {
     super.initState();
     _focusNode.addListener(() {
       setState(() {
-        borderColor = _focusNode.hasFocus ? appPrimaryColor : Colors.grey.withOpacity(0.5);
+        borderColor = _focusNode.hasFocus
+            ? appPrimaryColor
+            : Colors.grey.withOpacity(0.5);
       });
     });
   }
@@ -49,51 +51,56 @@ class _AlternativePhoneFieldState extends State<AlternativePhoneField> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width * 0.85,
-      height: 70, // Keeping original margins
-      child: IntlPhoneField(
-        focusNode: _focusNode,
-        controller: widget.controller,
-        decoration: InputDecoration(
-          contentPadding: const EdgeInsets.all(6), // Keeping original padding
-          labelText: 'Alternative Phone Number',
-          labelStyle: MyTextStyle.f14(greyColor),
-          floatingLabelStyle: TextStyle(color: appPrimaryColor),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12), // Keeping original radius
-            borderSide: BorderSide(color: borderColor, width: 1.5), // Keeping original width
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: borderColor, width: 1.5),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: appPrimaryColor, width: 1.5),
-          ),
-          filled: true,
-          fillColor: Colors.white38, //
+    return Center(
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.85,
+        height: 70,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.transparent), // Removed outer border
+          borderRadius: BorderRadius.circular(15),
         ),
-        initialCountryCode: 'IN',
-        showCountryFlag: false,
-        showDropdownIcon: false,
-        flagsButtonMargin: const EdgeInsets.only(right: 0),
-        flagsButtonPadding: const EdgeInsets.all(0),
-        dropdownIconPosition: IconPosition.trailing,
-        inputFormatters: formatters,
-        keyboardType: TextInputType.number,
-        style: MyTextStyle.f15(greyColor, weight: FontWeight.w400), // Keeping original text style
-        cursorColor: appPrimaryColor,
-        onChanged: (phone) {
-          widget.onPhoneChanged(phone.completeNumber);
-        },
-        onCountryChanged: (country) {
-          final maxLen = countryMaxLengths[country.code] ?? 10;
-          setState(() {
-            formatters = [LengthLimitingTextInputFormatter(maxLen)];
-          });
-        },
+        child: IntlPhoneField(
+          focusNode: _focusNode,
+          controller: widget.controller,
+          decoration: InputDecoration(
+            labelText: 'Alternative Number',
+            labelStyle: MyTextStyle.f14(greyColor),
+            floatingLabelStyle: TextStyle(color: appPrimaryColor),
+            floatingLabelBehavior: FloatingLabelBehavior.auto,
+            contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide(color: borderColor),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide(color: Colors.grey.shade300),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide(color: appPrimaryColor),
+            ),
+          ),
+          initialCountryCode: 'IN',
+          showCountryFlag: false,
+          showDropdownIcon: false,
+          flagsButtonMargin: const EdgeInsets.only(right: 0),
+          flagsButtonPadding: const EdgeInsets.all(0),
+          dropdownIconPosition: IconPosition.trailing,
+          inputFormatters: formatters,
+          keyboardType: TextInputType.number,
+          style: MyTextStyle.f15(greyColor, weight: FontWeight.w400),
+          cursorColor: appPrimaryColor,
+          onChanged: (phone) {
+            widget.onPhoneChanged(phone.completeNumber);
+          },
+          onCountryChanged: (country) {
+            final maxLen = countryMaxLengths[country.code] ?? 10;
+            setState(() {
+              formatters = [LengthLimitingTextInputFormatter(maxLen)];
+            });
+          },
+        ),
       ),
     );
   }

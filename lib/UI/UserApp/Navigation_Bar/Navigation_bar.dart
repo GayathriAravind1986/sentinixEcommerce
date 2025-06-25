@@ -30,22 +30,17 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
     Icons.notifications,
     Icons.person_outline,
   ];
-  callApis() async {
-    if (widget.selectTab == 1) {
-      _selectedIndex = 1;
-    }
-    if (widget.selectTab == 2) {
-      _selectedIndex = 2;
-    }
-    if (widget.selectTab == 3) {
-      _selectedIndex = 3;
+
+  void _initSelectedTab() {
+    if (widget.selectTab != null && widget.selectTab! >= 0 && widget.selectTab! < _pages.length) {
+      _selectedIndex = widget.selectTab!;
     }
   }
 
   @override
   void initState() {
-    callApis();
     super.initState();
+    _initSelectedTab();
   }
 
   @override
@@ -56,26 +51,27 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
           setState(() {
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (context) => const DashBoardScreen()),
-              (Route<dynamic> route) => false,
+                  (route) => false,
             );
           });
           return false;
         } else {
-          if (Navigator.of(context).canPop()) {
-            return true;
-          } else {
-            final shouldExit = await showExitConfirmationDialog(
-                context, MediaQuery.of(context).size);
-            return shouldExit;
-          }
+          if (Navigator.of(context).canPop()) return true;
+          final shouldExit = await showExitConfirmationDialog(
+            context,
+            MediaQuery.of(context).size,
+          );
+          return shouldExit;
         }
       },
       child: Scaffold(
         backgroundColor: whiteColor,
         body: _pages[_selectedIndex],
         bottomNavigationBar: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 10.0,
+          padding: const EdgeInsets.only(
+            left: 10.0,
+            right: 10.0,
+            bottom: 12.0,
           ),
           child: Container(
             height: 70,
@@ -93,9 +89,11 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: List.generate(_icons.length, (index) {
-                bool isSelected = index == _selectedIndex;
+                final isSelected = index == _selectedIndex;
                 return GestureDetector(
-                  onTap: () => setState(() => _selectedIndex = index),
+                  onTap: () {
+                    setState(() => _selectedIndex = index);
+                  },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
                     width: 50,

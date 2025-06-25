@@ -1,11 +1,11 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:sentinix_ecommerce/Bloc/demo/demo_bloc.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/parcel_pickup_drop.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Person_Pickup_Drop/person_pickup_drop.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/widget/home_card_widget.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'dart:async';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/Reusable/image.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
@@ -44,7 +44,6 @@ class _HomeScreenViewState extends State<HomeScreenView> {
   void initState() {
     super.initState();
     _startCarouselTimer();
-    //context.read<HomeBloc>().add(FetchHomeData());
   }
 
   void _startCarouselTimer() {
@@ -77,10 +76,17 @@ class _HomeScreenViewState extends State<HomeScreenView> {
     return 'Good Evening';
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     final greeting = getGreeting();
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        top: screenHeight * 0.04, // Responsive top padding
+        bottom: 24,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -92,13 +98,11 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                 children: [
                   Text(
                     '$greeting,',
-                    style:
-                        MyTextStyle.f20(Colors.black, weight: FontWeight.w600),
+                    style: MyTextStyle.f20(Colors.black, weight: FontWeight.w600),
                   ),
                   Text(
                     userName,
-                    style:
-                        MyTextStyle.f18(Colors.black, weight: FontWeight.bold),
+                    style: MyTextStyle.f18(Colors.black, weight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -129,8 +133,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
             itemCount: bannerImages.length,
             itemBuilder: (context, index) {
               return Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 30.0, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 2),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: Image.asset(
@@ -185,11 +188,9 @@ class _HomeScreenViewState extends State<HomeScreenView> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (_) => const PersonPickupDropScreen()),
+                MaterialPageRoute(builder: (_) => const PersonPickupDropScreen()),
               );
             },
-
             child: ServiceCard(
               title: 'Person Pickup & Drop',
               image: Images.person,
@@ -205,16 +206,19 @@ class _HomeScreenViewState extends State<HomeScreenView> {
   @override
   Widget build(BuildContext context) {
     Widget mainContainer() {
-      return SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(),
-            const SizedBox(height: 10),
-            _buildCarousel(),
-            const SizedBox(height: 30),
-            _buildServiceCards(),
-          ],
+      return SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.only(bottom: 20), // space above bottom nav
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(context),
+              const SizedBox(height: 10),
+              _buildCarousel(),
+              const SizedBox(height: 30),
+              _buildServiceCards(),
+            ],
+          ),
         ),
       );
     }
@@ -222,9 +226,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
     return Scaffold(
       backgroundColor: whiteColor,
       body: BlocBuilder<DemoBloc, dynamic>(
-        buildWhen: (previous, current) {
-          return false;
-        },
+        buildWhen: (previous, current) => false,
         builder: (context, dynamic) {
           return mainContainer();
         },

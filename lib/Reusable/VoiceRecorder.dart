@@ -105,7 +105,7 @@ class _VoiceRecorderBoxState extends State<VoiceRecorderBox> {
     return Container(
       // Keep width as per original, assuming it's part of the design
       width: MediaQuery.of(context).size.width * 0.85,
-      height: 45,
+      height: 48,
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey.shade300),
         borderRadius: BorderRadius.circular(15), // Rounded corners like the image
