@@ -10,7 +10,7 @@ android {
 //    namespace "com.example.simple.flutter_inappwebview"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
-    namespace "com.example.sentinix_ecommerce"
+    namespace "com.sentinix.prodeliverz"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -27,7 +27,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.sentinix_ecommerce"
+        applicationId = "com.sentinix.prodeliverz"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

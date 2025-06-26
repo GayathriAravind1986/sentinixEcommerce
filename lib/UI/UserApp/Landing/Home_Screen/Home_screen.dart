@@ -44,6 +44,15 @@ class _HomeScreenViewState extends State<HomeScreenView> {
   void initState() {
     super.initState();
     _startCarouselTimer();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _precacheImages();
+    });
+  }
+
+  void _precacheImages() {
+    for (final imagePath in bannerImages) {
+      precacheImage(AssetImage(imagePath), context);
+    }
   }
 
   void _startCarouselTimer() {
@@ -84,7 +93,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
       padding: EdgeInsets.only(
         left: 20,
         right: 20,
-        top: screenHeight * 0.04, // Responsive top padding
+        top: screenHeight * 0.04,
         bottom: 24,
       ),
       child: Column(
@@ -136,13 +145,15 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                 padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 2),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
-                  child: Image.asset(
-                    bannerImages[index],
-                    width: double.infinity,
-                    fit: BoxFit.fill,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: greyShade300,
-                      child: const Icon(Icons.broken_image),
+                  child: RepaintBoundary(
+                    child: Image.asset(
+                      bannerImages[index],
+                      width: double.infinity,
+                      fit: BoxFit.fill,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: greyShade300,
+                        child: const Icon(Icons.broken_image),
+                      ),
                     ),
                   ),
                 ),
@@ -208,7 +219,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
     Widget mainContainer() {
       return SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.only(bottom: 20), // space above bottom nav
+          padding: const EdgeInsets.only(bottom: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
