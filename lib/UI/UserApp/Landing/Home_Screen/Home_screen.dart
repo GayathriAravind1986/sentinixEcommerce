@@ -79,9 +79,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
   }
 
   String getGreeting() {
-    final hour = DateTime
-        .now()
-        .hour;
+    final hour = DateTime.now().hour;
     if (hour < 12) return 'Good Morning';
     if (hour < 17) return 'Good Afternoon';
     return 'Good Evening';
@@ -89,10 +87,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
 
   Widget _buildHeader(BuildContext context) {
     final greeting = getGreeting();
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final screenHeight = MediaQuery.of(context).size.height;
 
     return Padding(
       padding: EdgeInsets.only(
@@ -112,13 +107,13 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                 children: [
                   Text(
                     '$greeting,',
-                    style: MyTextStyle.f20(
-                        Colors.black, weight: FontWeight.w600),
+                    style:
+                        MyTextStyle.f20(Colors.black, weight: FontWeight.w600),
                   ),
                   Text(
                     userName,
-                    style: MyTextStyle.f18(
-                        Colors.black, weight: FontWeight.bold),
+                    style:
+                        MyTextStyle.f18(Colors.black, weight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -149,8 +144,8 @@ class _HomeScreenViewState extends State<HomeScreenView> {
             itemCount: bannerImages.length,
             itemBuilder: (context, index) {
               return Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 30.0, vertical: 2),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30.0, vertical: 2),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: RepaintBoundary(
@@ -158,11 +153,10 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                       bannerImages[index],
                       width: double.infinity,
                       fit: BoxFit.fill,
-                      errorBuilder: (context, error, stackTrace) =>
-                          Container(
-                            color: greyShade300,
-                            child: const Icon(Icons.broken_image),
-                          ),
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: greyShade300,
+                        child: const Icon(Icons.broken_image),
+                      ),
                     ),
                   ),
                 ),
@@ -214,7 +208,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
             },
             child: ServiceCard(
               title: 'Person Pickup & Drop',
-              image: Images.person,
+              image: Images.parcel,
               iconColor: appPrimaryColor,
               imageBackground: appSecondaryColor,
             ),
@@ -255,4 +249,3 @@ class _HomeScreenViewState extends State<HomeScreenView> {
     );
   }
 }
-

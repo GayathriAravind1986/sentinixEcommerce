@@ -67,17 +67,18 @@ class _AlternativePhoneFieldState extends State<AlternativePhoneField> {
             labelStyle: MyTextStyle.f14(greyColor),
             floatingLabelStyle: TextStyle(color: appPrimaryColor),
             floatingLabelBehavior: FloatingLabelBehavior.auto,
-            contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(color: borderColor),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(color: Colors.grey.shade300),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(color: appPrimaryColor),
             ),
           ),

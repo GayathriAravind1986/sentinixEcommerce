@@ -10,7 +10,6 @@ class LocationFields extends StatelessWidget {
   final VoidCallback onRemove;
   final Function(int index)? onTap;
 
-
   const LocationFields({
     super.key,
     required this.label,
@@ -30,7 +29,11 @@ class LocationFields extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(label, style: Theme.of(context).textTheme.titleMedium),
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child:
+                    Text(label, style: Theme.of(context).textTheme.titleMedium),
+              ),
               Row(
                 children: [
                   // ➖ Remove Icon: Disabled when only 1 field
@@ -62,19 +65,19 @@ class LocationFields extends StatelessWidget {
         // All pickup/drop fields
         ...List.generate(controllers.length, (i) {
           return Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child:  CustomTextField(
-              hint: '$label ${i + 1}',
-              controller: controllers[i],
-              readOnly: true,
-              onTap: () {
-                if (onTap != null){
-                  onTap!(i);
-                }
-              },
-              validator: (val) => val == null || val.trim().isEmpty ? 'Enter location' : null,
-            )
-          );
+              padding: const EdgeInsets.only(bottom: 12),
+              child: CustomTextField(
+                hint: '$label ${i + 1}',
+                controller: controllers[i],
+                readOnly: true,
+                onTap: () {
+                  if (onTap != null) {
+                    onTap!(i);
+                  }
+                },
+                validator: (val) =>
+                    val == null || val.trim().isEmpty ? 'Enter location' : null,
+              ));
         }),
       ],
     );

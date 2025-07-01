@@ -66,6 +66,10 @@ class _PickupDropViewState extends State<PickupDropView> {
   final _altPhoneController = TextEditingController();
 
   final List<File> _mediaFiles = [];
+  final List<File> _videoFiles = [];
+  final ImagePicker _picker = ImagePicker();
+  bool _isShowingImages = true;
+
   final List<String> _banners = [
     'assets/image/banner_1.png',
     'assets/image/banner_2.jpg',
@@ -188,6 +192,59 @@ class _PickupDropViewState extends State<PickupDropView> {
     if (mounted) setState(() => _mediaFiles.removeAt(index));
   }
 
+  Future<void> _pickVideo(ImageSource source) async {
+    if (_videoFiles.length >= 3) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("You can select up to 3 videos only")),
+      );
+      return;
+    }
+
+    final pickedFile = await _picker.pickVideo(source: source);
+
+    if (pickedFile != null) {
+      setState(() {
+        _videoFiles.add(File(pickedFile.path));
+        debugPrint("Picked video: ${pickedFile.path}");
+      });
+    }
+  }
+
+  void _removeVideo(int index) {
+    setState(() {
+      _videoFiles.removeAt(index);
+    });
+  }
+
+  void _showMediaVideoPicker() {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => Wrap(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.camera_alt, color: appPrimaryColor),
+            title: const Text("Image"),
+            onTap: () {
+              Navigator.pop(ctx);
+              _isShowingImages = true;
+              _showMediaPicker();
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.video_camera_back_outlined,
+                color: appPrimaryColor),
+            title: const Text("Video"),
+            onTap: () {
+              Navigator.pop(ctx);
+              _isShowingImages = false;
+              _showVideoPicker();
+            },
+          )
+        ],
+      ),
+    );
+  }
+
   void _showMediaPicker() {
     showModalBottomSheet(
       context: context,
@@ -207,6 +264,32 @@ class _PickupDropViewState extends State<PickupDropView> {
             onTap: () {
               Navigator.pop(ctx);
               _pickMedia(ImageSource.gallery);
+            },
+          )
+        ],
+      ),
+    );
+  }
+
+  void _showVideoPicker() {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => Wrap(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.videocam, color: appPrimaryColor),
+            title: const Text("Camera"),
+            onTap: () {
+              Navigator.pop(ctx);
+              _pickVideo(ImageSource.camera);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.video_library, color: appPrimaryColor),
+            title: const Text("Gallery"),
+            onTap: () {
+              Navigator.pop(ctx);
+              _pickVideo(ImageSource.gallery);
             },
           )
         ],
@@ -325,9 +408,13 @@ class _PickupDropViewState extends State<PickupDropView> {
                   style: MyTextStyle.f18(blackColor, weight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                Text("# Total 3.14 km", style: MyTextStyle.f18(blackColor, weight: FontWeight.bold)),
+                Text("# Total 3.14 km",
+                    style:
+                        MyTextStyle.f18(blackColor, weight: FontWeight.bold)),
                 const SizedBox(height: 20),
-                Text("Payment Details", style: MyTextStyle.f16(blackColor, weight: FontWeight.bold)),
+                Text("Payment Details",
+                    style:
+                        MyTextStyle.f16(blackColor, weight: FontWeight.bold)),
                 const SizedBox(height: 10),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -385,7 +472,8 @@ class _PickupDropViewState extends State<PickupDropView> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text("Confirm Order", style: MyTextStyle.f16(appPrimaryColor, weight: FontWeight.bold)),
+        title: Text("Confirm Order",
+            style: MyTextStyle.f16(appPrimaryColor, weight: FontWeight.bold)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -395,7 +483,8 @@ class _PickupDropViewState extends State<PickupDropView> {
             Text("Vehicle: $_selectedVehicle"),
             Text("Payment Method: $_selectedPaymentMethod"),
             const SizedBox(height: 16),
-            Text("Total Amount:", style: MyTextStyle.f16(blackColor, weight: FontWeight.bold)),
+            Text("Total Amount:",
+                style: MyTextStyle.f16(blackColor, weight: FontWeight.bold)),
             Text(
               _selectedVehicle == "Bike" ? "₹40.40" : "₹81.80",
               style: MyTextStyle.f18(blackColor, weight: FontWeight.bold),
@@ -433,23 +522,19 @@ class _PickupDropViewState extends State<PickupDropView> {
   @override
   Widget build(BuildContext context) {
     Widget mainContainer() {
-      // Define a consistent horizontal padding for MOST aligned elements (text fields, etc.)
-      // Adjust this value to fine-tune alignment for all wrapped fields (except VoiceRecorderBox)
-      const EdgeInsetsGeometry fieldHorizontalPadding = EdgeInsets.symmetric(horizontal: 8.0); // Example: adjust as needed for text fields
-
-      // Define a *separate* and *distinct* horizontal padding for the VoiceRecorderBox
-      // ADJUST THIS VALUE SPECIFICALLY FOR THE TAP MIC BOX
-      const EdgeInsetsGeometry micHorizontalPadding = EdgeInsets.symmetric(horizontal: 0.0); // Example: adjust as needed for mic box
+      const EdgeInsetsGeometry fieldHorizontalPadding =
+          EdgeInsets.symmetric(horizontal: 5.0);
+      const EdgeInsetsGeometry micHorizontalPadding =
+          EdgeInsets.symmetric(horizontal: 0.0);
 
       return SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0), // Main screen padding for the overall content
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
               BannerSlider(banners: _banners),
               const SizedBox(height: 24),
-              // ToggleButtons: Apply fieldHorizontalPadding for consistent alignment
               Padding(
                 padding: fieldHorizontalPadding,
                 child: ToggleButtons(
@@ -461,22 +546,30 @@ class _PickupDropViewState extends State<PickupDropView> {
                   onPressed: (index) {
                     setState(() {
                       _pickupType = index;
-                      // Reset controllers based on selection to avoid issues
-                      if (index == 0) { // Single
+                      if (index == 0) {
+                        // Single
                         _pickupControllers.clear();
                         _pickupControllers.add(TextEditingController());
                         _dropControllers.clear();
                         _dropControllers.add(TextEditingController());
-                      } else if (index == 1) { // Multi Pickup
+                      } else if (index == 1) {
+                        // Multi Pickup
                         _pickupControllers.clear();
-                        _pickupControllers.addAll([TextEditingController(), TextEditingController()]); // Start with 2 for multi
+                        _pickupControllers.addAll([
+                          TextEditingController(),
+                          TextEditingController()
+                        ]); // Start with 2 for multi
                         _dropControllers.clear();
                         _dropControllers.add(TextEditingController());
-                      } else if (index == 2) { // Multi Drop
+                      } else if (index == 2) {
+                        // Multi Drop
                         _pickupControllers.clear();
                         _pickupControllers.add(TextEditingController());
                         _dropControllers.clear();
-                        _dropControllers.addAll([TextEditingController(), TextEditingController()]); // Start with 2 for multi
+                        _dropControllers.addAll([
+                          TextEditingController(),
+                          TextEditingController()
+                        ]); // Start with 2 for multi
                       }
                     });
                   },
@@ -508,10 +601,13 @@ class _PickupDropViewState extends State<PickupDropView> {
                     showAddRemove: true,
                     onAdd: () {
                       if (_pickupControllers.length < 5) {
-                        setState(() => _pickupControllers.add(TextEditingController()));
+                        setState(() =>
+                            _pickupControllers.add(TextEditingController()));
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Maximum 5 pickup locations allowed")),
+                          const SnackBar(
+                              content:
+                                  Text("Maximum 5 pickup locations allowed")),
                         );
                       }
                     },
@@ -535,7 +631,6 @@ class _PickupDropViewState extends State<PickupDropView> {
                     onTap: (index) => selectAddress(true, index),
                   ),
                 ),
-              const SizedBox(height: 12),
               if (_pickupType == 2)
                 Padding(
                   padding: fieldHorizontalPadding,
@@ -545,10 +640,13 @@ class _PickupDropViewState extends State<PickupDropView> {
                     showAddRemove: true,
                     onAdd: () {
                       if (_dropControllers.length < 5) {
-                        setState(() => _dropControllers.add(TextEditingController()));
+                        setState(() =>
+                            _dropControllers.add(TextEditingController()));
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Maximum 5 drop locations allowed")),
+                          const SnackBar(
+                              content:
+                                  Text("Maximum 5 drop locations allowed")),
                         );
                       }
                     },
@@ -572,9 +670,6 @@ class _PickupDropViewState extends State<PickupDropView> {
                     onTap: (index) => selectAddress(false, index),
                   ),
                 ),
-
-              const SizedBox(height: 12),
-              // CustomTextField (Package Details): Apply fieldHorizontalPadding
               Padding(
                 padding: fieldHorizontalPadding,
                 child: CustomTextField(
@@ -586,7 +681,6 @@ class _PickupDropViewState extends State<PickupDropView> {
                 ),
               ),
               const SizedBox(height: 12),
-              // CustomTextField (Special Instructions): Apply fieldHorizontalPadding
               Padding(
                 padding: fieldHorizontalPadding,
                 child: CustomTextField(
@@ -599,13 +693,15 @@ class _PickupDropViewState extends State<PickupDropView> {
               const SizedBox(height: 12),
               // VoiceRecorderBox (Tap Mic): Apply its OWN specific padding
               Padding(
-                padding: micHorizontalPadding, // <<< UNIQUE PADDING HERE
+                //padding: micHorizontalPadding, // <<< UNIQUE PADDING HERE
+                padding: EdgeInsets.only(left: 15, right: 15),
                 child: VoiceRecorderBox(),
               ),
               const SizedBox(height: 12),
               // AlternativePhoneField: Apply fieldHorizontalPadding
               Padding(
-                padding: fieldHorizontalPadding,
+                //padding: fieldHorizontalPadding,
+                padding: EdgeInsets.only(left: 15, right: 15),
                 child: AlternativePhoneField(
                   controller: _altPhoneController,
                   onPhoneChanged: (val) {
@@ -617,11 +713,13 @@ class _PickupDropViewState extends State<PickupDropView> {
               const SizedBox(height: 16),
               // MediaPreviewWidget: Apply fieldHorizontalPadding
               Padding(
-                padding: fieldHorizontalPadding,
+                padding: EdgeInsets.only(left: 15, right: 15),
                 child: MediaPreviewWidget(
-                  mediaFiles: _mediaFiles,
-                  onAddMedia: _showMediaPicker,
-                  onRemoveMedia: (index) => _removeMedia(index),
+                  mediaFiles: _isShowingImages ? _mediaFiles : _videoFiles,
+                  onAddMedia: _showMediaVideoPicker,
+                  onRemoveMedia: (index) => _isShowingImages
+                      ? _removeMedia(index)
+                      : _removeVideo(index),
                 ),
               ),
               const SizedBox(height: 24),
@@ -630,6 +728,7 @@ class _PickupDropViewState extends State<PickupDropView> {
                 formKey: _formKey,
                 onValid: _showVehicleSelectionDialog,
               ),
+              const SizedBox(height: 24),
             ],
           ),
         ),

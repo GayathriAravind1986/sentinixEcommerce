@@ -7,6 +7,7 @@ import 'package:sentinix_ecommerce/Bloc/demo/demo_bloc.dart';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/Reusable/elevated_button.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Navigation_Bar/Navigation_bar.dart';
 
 class ProfileInfoPage extends StatelessWidget {
   final String userName;
@@ -93,6 +94,7 @@ class ProfileInfoPageViewState extends State<ProfileInfoPageView> {
       ),
     );
   }
+
   void _removeImage() => setState(() => customAvatar = null);
 
   Future<void> _pickMedia(ImageSource source) async {
@@ -107,7 +109,6 @@ class ProfileInfoPageViewState extends State<ProfileInfoPageView> {
   void _pickImage() {
     _showMediaPicker();
   }
-
 
   void _pickDOB() async {
     DateTime? picked = await showDatePicker(
@@ -145,14 +146,14 @@ class ProfileInfoPageViewState extends State<ProfileInfoPageView> {
   }
 
   Widget _buildField(
-      String label,
-      TextEditingController controller, {
-        IconData? icon,
-        TextInputType keyboardType = TextInputType.text,
-        String? Function(String?)? validator,
-        bool readOnly = false,
-        VoidCallback? onTap,
-      }) {
+    String label,
+    TextEditingController controller, {
+    IconData? icon,
+    TextInputType keyboardType = TextInputType.text,
+    String? Function(String?)? validator,
+    bool readOnly = false,
+    VoidCallback? onTap,
+  }) {
     return TextFormField(
       controller: controller,
       readOnly: readOnly,
@@ -163,7 +164,9 @@ class ProfileInfoPageViewState extends State<ProfileInfoPageView> {
       decoration: InputDecoration(
         labelText: label,
         labelStyle: TextStyle(color: Colors.black.withOpacity(0.6)),
-        prefixIcon: icon != null ? Icon(icon, color: Colors.black.withOpacity(0.6)) : null,
+        prefixIcon: icon != null
+            ? Icon(icon, color: Colors.black.withOpacity(0.6))
+            : null,
         filled: true,
         fillColor: Colors.grey.withOpacity(0.1),
         focusedBorder: OutlineInputBorder(
@@ -174,7 +177,8 @@ class ProfileInfoPageViewState extends State<ProfileInfoPageView> {
           borderSide: BorderSide(color: Colors.grey.withOpacity(0.3)),
           borderRadius: BorderRadius.circular(12),
         ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       ),
     );
   }
@@ -206,7 +210,8 @@ class ProfileInfoPageViewState extends State<ProfileInfoPageView> {
                         shape: BoxShape.circle,
                       ),
                       padding: const EdgeInsets.all(10),
-                      child: const Icon(Icons.edit, size: 20, color: Colors.white),
+                      child:
+                          const Icon(Icons.edit, size: 20, color: Colors.white),
                     ),
                   ),
                 ),
@@ -227,18 +232,22 @@ class ProfileInfoPageViewState extends State<ProfileInfoPageView> {
               ],
             ),
             const SizedBox(height: 30),
-            _buildField("Name", nameController, icon: Icons.person, validator: (val) {
+            _buildField("Name", nameController, icon: Icons.person,
+                validator: (val) {
               if (val == null || val.isEmpty) return "Name cannot be empty";
               return null;
             }),
             const SizedBox(height: 16),
-            _buildField("Date of Birth", dobController, icon: Icons.calendar_today,
-                readOnly: true, onTap: _pickDOB),
+            _buildField("Date of Birth", dobController,
+                icon: Icons.calendar_today, readOnly: true, onTap: _pickDOB),
             const SizedBox(height: 16),
-            _buildField("Phone Number", phoneController, icon: Icons.phone,
-                keyboardType: TextInputType.phone, readOnly: true),
+            _buildField("Phone Number", phoneController,
+                icon: Icons.phone,
+                keyboardType: TextInputType.phone,
+                readOnly: true),
             const SizedBox(height: 16),
-            _buildField("Alt Phone (Optional)", altPhoneController, icon: Icons.phone_android),
+            _buildField("Alt Phone (Optional)", altPhoneController,
+                icon: Icons.phone_android),
             const SizedBox(height: 30),
             CustomButton(
               text: "SAVE CHANGES",
@@ -254,15 +263,33 @@ class ProfileInfoPageViewState extends State<ProfileInfoPageView> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        elevation: 0,
-        backgroundColor: appPrimaryColor,
-        centerTitle: true,
-        title:  Text('Edit profile', style: MyTextStyle.f20(whiteColor, weight: FontWeight.w600)),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(55),
+        child: AppBar(
+          automaticallyImplyLeading: false,
+          elevation: 0,
+          backgroundColor: appPrimaryColor,
+          title: Text("Edit Profile",
+              style: MyTextStyle.f20(whiteColor, weight: FontWeight.w600)),
+          centerTitle: true,
+          leading: InkWell(
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DashBoardScreen(
+                    selectTab: 3,
+                  ),
+                ),
+              );
+            },
+            child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(
+                  Icons.arrow_back_ios_new_outlined,
+                  color: whiteColor,
+                )),
+          ),
         ),
       ),
       body: BlocBuilder<DemoBloc, dynamic>(

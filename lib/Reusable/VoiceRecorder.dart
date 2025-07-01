@@ -52,7 +52,8 @@ class _VoiceRecorderBoxState extends State<VoiceRecorderBox> {
   Future<void> _startRecording() async {
     try {
       final dir = await getApplicationDocumentsDirectory();
-      final path = '${dir.path}/voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
+      final path =
+          '${dir.path}/voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
 
       _recorder = AnotherAudioRecorder(path, audioFormat: AudioFormat.AAC);
       await _recorder!.initialized;
@@ -108,12 +109,14 @@ class _VoiceRecorderBoxState extends State<VoiceRecorderBox> {
       height: 48,
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(15), // Rounded corners like the image
+        borderRadius:
+            BorderRadius.circular(10), // Rounded corners like the image
       ),
       // Crucial change for alignment: Adjusted horizontal padding
       // This padding, combined with the mic button's padding, should
       // align the "Tap mic to record" text with the input text of other fields.
-      padding: const EdgeInsets.symmetric(horizontal: 4.0), // Reduced from 16 to 4
+      padding:
+          const EdgeInsets.symmetric(horizontal: 4.0), // Reduced from 16 to 4
       child: Row(
         children: [
           // Microphone button - toggle on tap
@@ -121,9 +124,12 @@ class _VoiceRecorderBoxState extends State<VoiceRecorderBox> {
             onTap: _toggleRecording,
             child: Container(
               // Mic icon container padding also reduced/adjusted if necessary
-              padding: const EdgeInsets.all(8), // Keep this as it styles the button itself
+              padding: const EdgeInsets.all(
+                  8), // Keep this as it styles the button itself
               decoration: BoxDecoration(
-                color: _isRecording ? Colors.red.withOpacity(0.1) : Colors.transparent,
+                color: _isRecording
+                    ? Colors.red.withOpacity(0.1)
+                    : Colors.transparent,
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -141,8 +147,8 @@ class _VoiceRecorderBoxState extends State<VoiceRecorderBox> {
               _isRecording
                   ? "Recording..."
                   : _recordedFile != null
-                  ? "Audio recorded"
-                  : "Tap mic to record",
+                      ? "Audio recorded"
+                      : "Tap mic to record",
               style: MyTextStyle.f14(greyColor),
             ),
           ),

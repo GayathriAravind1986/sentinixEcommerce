@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/widget/video_player_widget.dart';
 
 class MediaPreviewWidget extends StatelessWidget {
   final List<File> mediaFiles;
@@ -56,6 +57,7 @@ class MediaPreviewWidget extends StatelessWidget {
               ...mediaFiles.asMap().entries.map((entry) {
                 final index = entry.key;
                 final file = entry.value;
+                final isVideo = file.path.toLowerCase().endsWith('.mp4');
                 return Container(
                   margin: const EdgeInsets.only(right: 12),
                   width: 120,
@@ -64,16 +66,18 @@ class MediaPreviewWidget extends StatelessWidget {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.file(
-                          file,
-                          width: 120,
-                          height: 120,
-                          fit: BoxFit.cover,
-                          errorBuilder: (ctx, error, stack) => Container(
-                            color: greyShade300 ?? Colors.grey.shade300,
-                            child: const Icon(Icons.broken_image),
-                          ),
-                        ),
+                        child: isVideo
+                            ? VideoPlayerWidget(videoFile: file)
+                            : Image.file(
+                                file,
+                                width: 110,
+                                height: 120,
+                                fit: BoxFit.cover,
+                                errorBuilder: (ctx, error, stack) => Container(
+                                  color: greyShade300 ?? Colors.grey.shade300,
+                                  child: const Icon(Icons.broken_image),
+                                ),
+                              ),
                       ),
                       Positioned(
                         top: 0,
