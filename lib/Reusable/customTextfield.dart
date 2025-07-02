@@ -5,12 +5,12 @@ import 'package:sentinix_ecommerce/Reusable/formatter.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
 
 class CustomTextField extends StatelessWidget {
-  const CustomTextField
-      ({
+  const CustomTextField({
     super.key,
     required this.hint,
     this.readOnly = false,
     required this.controller,
+    this.FTextInputFormatter,
     this.baseColor = appPrimaryColor,
     this.borderColor = appGreyColor,
     this.errorColor = redColor,
@@ -36,6 +36,7 @@ class CustomTextField extends StatelessWidget {
   final String hint;
   final bool readOnly;
   final TextEditingController controller;
+  final FilteringTextInputFormatter? FTextInputFormatter;
   final Color baseColor;
   final Color borderColor;
   final Color errorColor;
@@ -56,8 +57,6 @@ class CustomTextField extends StatelessWidget {
   final double? height;
   final IconData? prefixIcon;
   final TextInputType? keyboardType;
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -88,6 +87,7 @@ class CustomTextField extends StatelessWidget {
                     ? TextCapitalization.characters
                     : TextCapitalization.none,
                 inputFormatters: [
+                  if (FTextInputFormatter != null) FTextInputFormatter!,
                   if (textInputFormatter != null)
                     textInputFormatter!, // Using renamed property
                   if (isUpperCase)
@@ -136,7 +136,6 @@ class CustomTextField extends StatelessWidget {
                   ),
                   suffixIcon: showSuffixIcon ? suffixIcon : null,
                 ),
-
               ),
             ),
           ),

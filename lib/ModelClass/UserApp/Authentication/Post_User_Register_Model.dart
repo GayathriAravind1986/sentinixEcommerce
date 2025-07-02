@@ -1,3 +1,5 @@
+import 'package:sentinix_ecommerce/Bloc/Response/errorResponse.dart';
+
 /// success : true
 /// data : {"status":true,"message":"User created successfully","user":{"isActive":true,"isDeleted":false,"createdAt":"2025-07-01T12:27:33.478Z","modifiedAt":"2025-07-01T12:27:33.478Z","id":6,"name":"Ananya","phone":"9876543211","alternative_phone":"9876500000","dob":"2000-01-01","otp":null,"email":"anan@gmail.com","roll_id":1}}
 
@@ -5,6 +7,7 @@ class PostUserRegisterModel {
   PostUserRegisterModel({
     bool? success,
     Data? data,
+    ErrorResponse? errorResponse,
   }) {
     _success = success;
     _data = data;
@@ -13,9 +16,15 @@ class PostUserRegisterModel {
   PostUserRegisterModel.fromJson(dynamic json) {
     _success = json['success'];
     _data = json['data'] != null ? Data.fromJson(json['data']) : null;
+    if (json['errors'] != null && json['errors'] is Map<String, dynamic>) {
+      errorResponse = ErrorResponse.fromJson(json['errors']);
+    } else {
+      errorResponse = null;
+    }
   }
   bool? _success;
   Data? _data;
+  ErrorResponse? errorResponse;
   PostUserRegisterModel copyWith({
     bool? success,
     Data? data,
@@ -32,6 +41,9 @@ class PostUserRegisterModel {
     map['success'] = _success;
     if (_data != null) {
       map['data'] = _data?.toJson();
+    }
+    if (errorResponse != null) {
+      map['errors'] = errorResponse!.toJson();
     }
     return map;
   }

@@ -7,11 +7,12 @@ import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
 class CustomPhoneField extends StatefulWidget {
   final Function(String completePhoneNumber) onPhoneChanged;
   final TextEditingController? controller;
-
+  final String? Function(String?)? validator;
   const CustomPhoneField({
     super.key,
     required this.onPhoneChanged,
     this.controller,
+    this.validator,
   });
 
   @override
@@ -42,6 +43,7 @@ class _CustomPhoneFieldState extends State<CustomPhoneField> {
           borderRadius: BorderRadius.circular(15),
         ),
       ),
+      controller: widget.controller,
       initialCountryCode: 'IN',
       showCountryFlag: false,
       showDropdownIcon: false,
@@ -50,11 +52,14 @@ class _CustomPhoneFieldState extends State<CustomPhoneField> {
       dropdownIconPosition: IconPosition.trailing,
       inputFormatters: formatters,
       keyboardType: TextInputType.number,
-      style: MyTextStyle.f15(greyColor, weight: FontWeight.w400),
+      style: MyTextStyle.f15(blackColor, weight: FontWeight.w400),
       cursorColor: appPrimaryColor,
       onChanged: (phone) {
         widget.onPhoneChanged(phone.completeNumber);
       },
+      validator: widget.validator != null
+          ? (phoneNumber) => widget.validator!(phoneNumber?.number)
+          : null,
       onCountryChanged: (country) {
         final maxLen = countryMaxLengths[country.code] ?? 10;
         setState(() {

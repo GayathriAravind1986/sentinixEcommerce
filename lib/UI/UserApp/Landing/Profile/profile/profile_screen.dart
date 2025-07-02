@@ -4,9 +4,11 @@ import 'package:sentinix_ecommerce/Bloc/demo/demo_bloc.dart';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/Reusable/image.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Authentication/login.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Profile/MyOrders/my_order_screen.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Profile/profile/profile_info_page.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Profile/profile/widget/profile_tile_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -188,9 +190,17 @@ class ProfileScreenViewState extends State<ProfileScreenView> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: TextButton(
-                    onPressed: () {
-                      Navigator.pop(context, true);
-                      // SystemNavigator.pop(); // Closes the app
+                    onPressed: () async {
+                      SharedPreferences sharedPreference =
+                          await SharedPreferences.getInstance();
+                      await sharedPreference.remove('userId');
+                      await sharedPreference.remove('roleId');
+                      await sharedPreference.remove('token');
+                      Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const LoginCustomer()),
+                          (route) => false);
                     },
                     child: Text(
                       "Logout",

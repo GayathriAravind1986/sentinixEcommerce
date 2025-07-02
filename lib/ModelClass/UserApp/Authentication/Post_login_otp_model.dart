@@ -1,3 +1,5 @@
+import 'package:sentinix_ecommerce/Bloc/Response/errorResponse.dart';
+
 /// success : true
 /// data : {"status":true,"message":"Login successful","token":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwibmFtZSI6IkFuYW55YSIsInBob25lIjoiOTg3NjU0MzIxMSIsImFsdGVybmF0aXZlX3Bob25lIjoiOTg3NjUwMDAwMCIsImRvYiI6IjIwMDAtMDEtMDEiLCJvdHAiOm51bGwsImVtYWlsIjoiYW5hbkBnbWFpbC5jb20iLCJyb2xsX2lkIjoxLCJpc0FjdGl2ZSI6dHJ1ZSwiaXNEZWxldGVkIjpmYWxzZSwiY3JlYXRlZEF0IjoiMjAyNS0wNy0wMVQxMjoyNzozMy40NzhaIiwibW9kaWZpZWRBdCI6IjIwMjUtMDctMDFUMTI6Mjc6MzMuNDc4WiIsImlhdCI6MTc1MTM3MzE4MywiZXhwIjoxNzUxNDE2MzgzfQ.i8W55lLavKHxBLDgsVt_FrWSkt-7CnZ2VPPwbT0UiYQ","user":{"id":6,"name":"Ananya","phone":"9876543211"}}
 
@@ -5,6 +7,7 @@ class PostLoginOtpModel {
   PostLoginOtpModel({
     bool? success,
     Data? data,
+    ErrorResponse? errorResponse,
   }) {
     _success = success;
     _data = data;
@@ -13,9 +16,15 @@ class PostLoginOtpModel {
   PostLoginOtpModel.fromJson(dynamic json) {
     _success = json['success'];
     _data = json['data'] != null ? Data.fromJson(json['data']) : null;
+    if (json['errors'] != null && json['errors'] is Map<String, dynamic>) {
+      errorResponse = ErrorResponse.fromJson(json['errors']);
+    } else {
+      errorResponse = null;
+    }
   }
   bool? _success;
   Data? _data;
+  ErrorResponse? errorResponse;
   PostLoginOtpModel copyWith({
     bool? success,
     Data? data,
@@ -32,6 +41,9 @@ class PostLoginOtpModel {
     map['success'] = _success;
     if (_data != null) {
       map['data'] = _data?.toJson();
+    }
+    if (errorResponse != null) {
+      map['errors'] = errorResponse!.toJson();
     }
     return map;
   }

@@ -2,6 +2,11 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sentinix_ecommerce/Bloc/Response/errorResponse.dart';
+import 'package:sentinix_ecommerce/ModelClass/UserApp/Authentication/Post_User_Register_Model.dart';
+import 'package:sentinix_ecommerce/ModelClass/UserApp/Authentication/Post_login_model.dart';
+import 'package:sentinix_ecommerce/ModelClass/UserApp/Authentication/Post_login_otp_model.dart';
+import 'package:sentinix_ecommerce/Reusable/constant.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// All API Integration in ApiProvider
 class ApiProvider {
@@ -13,6 +18,167 @@ class ApiProvider {
         connectTimeout: const Duration(milliseconds: 150000),
         receiveTimeout: const Duration(milliseconds: 100000));
     _dio = Dio(options);
+  }
+  /* USER APP */
+  /// Register page API Integration
+
+  Future<PostUserRegisterModel> signUpUserAPI(
+    String name,
+    String phone,
+    String email,
+    String altPhone,
+    String dob,
+  ) async {
+    try {
+      final dataMap = {
+        "name": name,
+        "phone": phone,
+        "email": email,
+        "alternative_phone": altPhone,
+        "dob": dob,
+        "roll_id": 1,
+      };
+
+      debugPrint(json.encode(dataMap));
+      var data = json.encode(dataMap);
+      var dio = Dio();
+      debugPrint("API baseUrl: ${Constants.userBaseUrl}");
+      var response = await dio.request(
+        '${Constants.userBaseUrl}register'.trim(),
+        options: Options(method: 'POST'),
+        data: data,
+      );
+
+      debugPrint("API statuscode: ${response.statusCode}");
+
+      if (response.statusCode == 200 && response.data != null) {
+        if (response.data['success'] == true) {
+          PostUserRegisterModel postUserRegisterModel =
+              PostUserRegisterModel.fromJson(response.data);
+          if (postUserRegisterModel.data != null &&
+              postUserRegisterModel.data!.user != null) {
+            SharedPreferences sharedPreferences =
+                await SharedPreferences.getInstance();
+            sharedPreferences.setString(
+              "roleId",
+              postUserRegisterModel.data!.user!.rollId.toString(),
+            );
+
+            return postUserRegisterModel;
+          } else {
+            return postUserRegisterModel;
+          }
+        } else {
+          return PostUserRegisterModel()
+            ..errorResponse = ErrorResponse(
+              message: "Error: ${response.data['message'] ?? 'Unknown error'}",
+            );
+        }
+      }
+      return PostUserRegisterModel()
+        ..errorResponse = ErrorResponse(message: "Unexpected error occurred.");
+    } catch (error) {
+      debugPrint("ErrorCatch: $error");
+      return PostUserRegisterModel()..errorResponse = handleError(error);
+    }
+  }
+
+  /// Login - phone API Integration
+  Future<PostLoginModel> loginUserAPI(
+    String phone,
+  ) async {
+    try {
+      final dataMap = {
+        "phone": phone,
+      };
+
+      debugPrint(json.encode(dataMap));
+      var data = json.encode(dataMap);
+      var dio = Dio();
+      debugPrint("API baseUrl: ${Constants.userBaseUrl}");
+      var response = await dio.request(
+        '${Constants.userBaseUrl}register/request-otp'.trim(),
+        options: Options(method: 'POST'),
+        data: data,
+      );
+
+      debugPrint("API statuscode: ${response.statusCode}");
+
+      if (response.statusCode == 200 && response.data != null) {
+        if (response.data['success'] == true) {
+          debugPrint("API Response: ${json.encode(response.data)}");
+          PostLoginModel postUserLoginModel =
+              PostLoginModel.fromJson(response.data);
+          return postUserLoginModel;
+        }
+      } else {
+        return PostLoginModel()
+          ..errorResponse = ErrorResponse(
+            message: "Error: ${response.data['message'] ?? 'Unknown error'}",
+          );
+      }
+      return PostLoginModel()
+        ..errorResponse = ErrorResponse(message: "Unexpected error occurred.");
+    } catch (error) {
+      debugPrint("ErrorCatch: $error");
+      return PostLoginModel()..errorResponse = handleError(error);
+    }
+  }
+
+  /// LoginWithOTP API Integration
+  Future<PostLoginOtpModel> loginWithOtpUserAPI(
+    String phone,
+    String otp,
+  ) async {
+    try {
+      final dataMap = {"phone": phone, "otp": otp};
+
+      debugPrint(json.encode(dataMap));
+      var data = json.encode(dataMap);
+      var dio = Dio();
+      debugPrint("API baseUrl: ${Constants.userBaseUrl}");
+      var response = await dio.request(
+        '${Constants.userBaseUrl}register/login-with-otp'.trim(),
+        options: Options(method: 'POST'),
+        data: data,
+      );
+
+      debugPrint("API statuscode: ${response.statusCode}");
+
+      if (response.statusCode == 200 && response.data != null) {
+        if (response.data['success'] == true) {
+          debugPrint("API Response: ${json.encode(response.data)}");
+          PostLoginOtpModel postLoginOtpResponse =
+              PostLoginOtpModel.fromJson(response.data);
+          if (postLoginOtpResponse.data != null &&
+              postLoginOtpResponse.data!.user != null) {
+            SharedPreferences sharedPreferences =
+                await SharedPreferences.getInstance();
+            sharedPreferences.setString(
+              "userId",
+              postLoginOtpResponse.data!.user!.id.toString(),
+            );
+            sharedPreferences.setString(
+              "token",
+              postLoginOtpResponse.data!.token.toString(),
+            );
+            return postLoginOtpResponse;
+          } else {
+            return postLoginOtpResponse;
+          }
+        }
+      } else {
+        return PostLoginOtpModel()
+          ..errorResponse = ErrorResponse(
+            message: "Error: ${response.data['message'] ?? 'Unknown error'}",
+          );
+      }
+      return PostLoginOtpModel()
+        ..errorResponse = ErrorResponse(message: "Unexpected error occurred.");
+    } catch (error) {
+      debugPrint("ErrorCatch: $error");
+      return PostLoginOtpModel()..errorResponse = handleError(error);
+    }
   }
 
   /// handle Error Response
