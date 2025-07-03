@@ -49,10 +49,10 @@ class _SplashScreenState extends State<SplashScreen> {
                       builder: (context) => const DashBoardDeliveryScreen()),
                   (Route<dynamic> route) => false);
     }
-    // Navigator.of(context).pushAndRemoveUntil(
-    //   MaterialPageRoute(builder: (context) => const LoginCustomer()),
-    //   (Route<dynamic> route) => false,
-    // );
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => const LoginCustomer()),
+      (Route<dynamic> route) => false,
+    );
   }
 
   @override

@@ -620,7 +620,7 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
                   child: CustomDropdownField<String>(
                     hint: "Select Vehicle",
                     value: _selectedVehicle,
-                    items: ["Bike", "Car", "Van","Cycle","Lorry","Truck","Train"]
+                    items: ["Bike", "Car","Auto"]
                         .map((v) => DropdownMenuItem(value: v, child: Text(v,
                       style: MyTextStyle.f16(appPrimaryColor),)))
                         .toList(),
@@ -643,12 +643,13 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
                       : _removeVideo(index),
                 ),
               ),
-              if (_selectedVehicle != null)
-                ChosenVehicleDetails(
-                  selectedVehicle: _selectedVehicle,
-                  totalKm: 3.5, // Replace with your real calculated KM later
+              if (_selectedVehicle != null) ...[
+                ChosenVehicleInfo(
+                  selectedVehicle: _selectedVehicle!,
+                  totalKm: 5.0,           // Example value
+                  totalMinutes: 4,        // Example value
                 ),
-
+              ],
               const SizedBox(height: 24),
               SubmitButton(
                 formKey: _formKey,
