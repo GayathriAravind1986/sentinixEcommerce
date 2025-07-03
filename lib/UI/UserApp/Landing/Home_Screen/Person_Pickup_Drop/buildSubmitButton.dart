@@ -11,7 +11,7 @@ class SubmitButton extends StatelessWidget {
     super.key,
     required this.formKey,
     required this.onValid,
-    this.text = "Continue",
+    this.text = "Book Ride",
   });
 
   @override

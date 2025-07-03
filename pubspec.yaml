@@ -63,6 +63,8 @@ dependencies:
   geolocator: ^10.0.0
   audioplayers: ^5.2.1
   video_player: ^2.7.2
+  dropdown_button2: ^2.3.9
+
 
 
 
