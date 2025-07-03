@@ -622,19 +622,24 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
                   child: CustomDropdownField<String>(
                     hint: "Select Vehicle",
                     value: _selectedVehicle,
-                    items: ["Bike", "Car","Auto"]
-                        .map((v) => DropdownMenuItem(value: v, child: Text(v,
-                      style: MyTextStyle.f16(appPrimaryColor),)))
+                    items: ["Bike", "Car", "Auto"]
+                        .map((v) => DropdownMenuItem(
+                            value: v,
+                            child: Text(
+                              v,
+                              style: MyTextStyle.f16(appPrimaryColor),
+                            )))
                         .toList(),
                     onChanged: (val) {
                       setState(() => _selectedVehicle = val);
-                          },
-                          validator: (val) => val == null ? 'Please select a vehicle' : null,
-                        ),
-                      ),
+                    },
+                    validator: (val) =>
+                        val == null ? 'Please select a vehicle' : null,
+                  ),
+                ),
               ),
 
-      const SizedBox(height: 16),
+              const SizedBox(height: 16),
               Padding(
                 padding: EdgeInsets.only(left: 15, right: 15),
                 child: MediaPreviewWidget(
@@ -648,8 +653,8 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
               if (_selectedVehicle != null) ...[
                 ChosenVehicleInfo(
                   selectedVehicle: _selectedVehicle!,
-                  totalKm: 5.0,           // Example value
-                  totalMinutes: 4,        // Example value
+                  totalKm: 5.0, // Example value
+                  totalMinutes: 4, // Example value
                 ),
               ],
               const SizedBox(height: 24),
