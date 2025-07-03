@@ -191,7 +191,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
               );
             },
             child: ServiceCard(
-              title: 'Parcel Pickup & Drop',
+              title: 'Parcel Delivery',
               image: Images.parcel,
               iconColor: appPrimaryColor,
               imageBackground: appSecondaryColor,
@@ -207,7 +207,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
               );
             },
             child: ServiceCard(
-              title: 'Person Pickup & Drop',
+              title: 'Ride Booking',
               image: Images.parcel,
               iconColor: appPrimaryColor,
               imageBackground: appSecondaryColor,

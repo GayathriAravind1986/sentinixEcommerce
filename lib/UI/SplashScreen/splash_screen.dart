@@ -39,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen> {
               MaterialPageRoute(
                 builder: (context) => const LoginCustomer(),
               ))
-          : roleId == 1 || token != null
+          : roleId == 1 && token != null
               ? Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(
                       builder: (context) => const DashBoardScreen()),

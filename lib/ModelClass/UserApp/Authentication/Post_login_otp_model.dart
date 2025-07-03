@@ -113,39 +113,47 @@ class Data {
 class User {
   User({
     num? id,
+    num? rollId,
     String? name,
     String? phone,
   }) {
     _id = id;
+    _rollId = rollId;
     _name = name;
     _phone = phone;
   }
 
   User.fromJson(dynamic json) {
     _id = json['id'];
+    _rollId = json['roll_id'];
     _name = json['name'];
     _phone = json['phone'];
   }
   num? _id;
+  num? _rollId;
   String? _name;
   String? _phone;
   User copyWith({
     num? id,
+    num? rollId,
     String? name,
     String? phone,
   }) =>
       User(
         id: id ?? _id,
+        rollId: rollId ?? _rollId,
         name: name ?? _name,
         phone: phone ?? _phone,
       );
   num? get id => _id;
+  num? get rollId => _rollId;
   String? get name => _name;
   String? get phone => _phone;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['id'] = _id;
+    map['roll_id'] = _rollId;
     map['name'] = _name;
     map['phone'] = _phone;
     return map;

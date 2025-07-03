@@ -55,19 +55,7 @@ class ApiProvider {
         if (response.data['success'] == true) {
           PostUserRegisterModel postUserRegisterModel =
               PostUserRegisterModel.fromJson(response.data);
-          if (postUserRegisterModel.data != null &&
-              postUserRegisterModel.data!.user != null) {
-            SharedPreferences sharedPreferences =
-                await SharedPreferences.getInstance();
-            sharedPreferences.setString(
-              "roleId",
-              postUserRegisterModel.data!.user!.rollId.toString(),
-            );
-
-            return postUserRegisterModel;
-          } else {
-            return postUserRegisterModel;
-          }
+          return postUserRegisterModel;
         } else {
           return PostUserRegisterModel()
             ..errorResponse = ErrorResponse(
@@ -157,6 +145,10 @@ class ApiProvider {
             sharedPreferences.setString(
               "userId",
               postLoginOtpResponse.data!.user!.id.toString(),
+            );
+            sharedPreferences.setString(
+              "roleId",
+              postLoginOtpResponse.data!.user!.rollId.toString(),
             );
             sharedPreferences.setString(
               "token",
