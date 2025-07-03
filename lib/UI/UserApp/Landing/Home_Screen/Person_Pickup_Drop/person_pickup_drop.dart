@@ -11,7 +11,6 @@ import 'package:sentinix_ecommerce/Bloc/demo/demo_bloc.dart';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/Reusable/customTextfield.dart';
 import 'package:sentinix_ecommerce/Reusable/alternative_number.dart';
-import 'package:sentinix_ecommerce/Reusable/VoiceRecorder.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Navigation_Bar/Navigation_bar.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/GoogleMap/google_map_widget.dart';
@@ -23,6 +22,8 @@ import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Person_Pickup_
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Person_Pickup_Drop/buildPaymentRow.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Person_Pickup_Drop/buildSubmitButton.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Person_Pickup_Drop/add_address.dart';
+import 'package:sentinix_ecommerce/Reusable/customdropfield.dart';
+import 'package:sentinix_ecommerce/Reusable/chosen_vehicles.dart';
 
 class PersonPickupDropScreen extends StatelessWidget {
   const PersonPickupDropScreen({super.key});
@@ -47,11 +48,13 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
   final _formKey = GlobalKey<FormState>();
   final _pageController = PageController();
   int _currentPage = 0;
-  int _pickupType = 0;
   String _selectedPaymentMethod = 'COD';
   String? _selectedVehicle;
   late Timer _timer;
   LatLng? _selectedPosition;
+
+
+
 
   final _pickupControllers = [TextEditingController()];
   final _dropControllers = [TextEditingController()];
@@ -520,93 +523,54 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
             children: [
               BannerSlider(banners: _banners),
               const SizedBox(height: 24),
-              ToggleButtons(
-                isSelected: [_pickupType == 0, _pickupType == 1],
-                // onPressed: (index) => setState(() => _pickupType = index),
-                onPressed: (index) {
-                  setState(() {
-                    _pickupType = index;
-                    if (index == 0) {
-                      // Single
-                      _pickupControllers.clear();
-                      _pickupControllers.add(TextEditingController());
-                      _dropControllers.clear();
-                      _dropControllers.add(TextEditingController());
-                    } else if (index == 1) {
-                      // Multi Pickup
-                      _pickupControllers.clear();
-                      _pickupControllers.addAll([
-                        TextEditingController(),
-                        TextEditingController()
-                      ]); // Start with 2 for multi
-                      _dropControllers.clear();
-                      _dropControllers.add(TextEditingController());
+              Padding(
+                padding: fieldHorizontalPadding,
+                child: LocationFields(
+                  label: "Pickup Location",
+                  controllers: _pickupControllers,
+                  showAddRemove: true,
+                  onAdd: () {
+                    if (_pickupControllers.length < 4) {
+                      setState(() => _pickupControllers.add(TextEditingController()));
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text("Maximum 4 pickup locations allowed")),
+                      );
                     }
-                  });
-                },
-                borderRadius: BorderRadius.circular(8),
-                selectedColor: whiteColor,
-                fillColor: appPrimaryColor,
-                color: appPrimaryColor,
-                children: const [
-                  Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      child: Text("Single")),
-                  Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      child: Text("Multi Pickup")),
-                ],
-              ),
-              const SizedBox(height: 24),
-              if (_pickupType == 1)
-                Padding(
-                  padding: fieldHorizontalPadding,
-                  child: LocationFields(
-                    label: "Pickup Location",
-                    controllers: _pickupControllers,
-                    showAddRemove: _pickupType == 1,
-                    onAdd: () {
-                      if (_pickupControllers.length < 4) {
-                        setState(() =>
-                            _pickupControllers.add(TextEditingController()));
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content:
-                                  Text("Maximum 4 pickup locations allowed")),
-                        );
-                      }
-                    },
-                    onRemove: () {
-                      if (_pickupControllers.length > 1) {
-                        setState(() => _pickupControllers.removeLast());
-                      }
-                    },
-                    onTap: (index) => selectAddress(true, index),
-                  ),
-                )
-              else
-                Padding(
-                  padding: fieldHorizontalPadding,
-                  child: LocationFields(
-                    label: "Pickup Location",
-                    controllers: [_pickupControllers[0]],
-                    showAddRemove: false,
-                    onAdd: () {},
-                    onRemove: () {},
-                    onTap: (index) => selectAddress(true, index),
-                  ),
+                  },
+                  onRemove: () {
+                    if (_pickupControllers.length > 1) {
+                      setState(() => _pickupControllers.removeLast());
+                    }
+                  },
+                  onTap: (index) => selectAddress(true, index),
                 ),
+              ),
+
               const SizedBox(height: 12),
               Padding(
                 padding: fieldHorizontalPadding,
                 child: LocationFields(
                   label: "Drop Location",
-                  controllers: [_dropControllers[0]],
-                  showAddRemove: false,
-                  onAdd: () {},
-                  onRemove: () {},
-                  onTap: (index) => selectAddress(false, index),
+                  controllers: _dropControllers,
+                  showAddRemove: true,
+                  onAdd: () {
+                    if (_dropControllers.length < 4) {
+                      setState(() => _dropControllers.add(TextEditingController()));
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text("Maximum 4 pickup locations allowed")),
+                      );
+                    }
+                  },
+                  onRemove: () {
+                    if (_dropControllers.length > 1) {
+                      setState(() => _dropControllers.removeLast());
+                    }
+                  },
+                  onTap: (index) => selectAddress(true, index),
                 ),
               ),
               const SizedBox(height: 12),
@@ -630,16 +594,16 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
                   validator: (val) => null, // Optional field
                 ),
               ),
+              // const SizedBox(height: 12),
+              // Padding(
+              //   //padding: micHorizontalPadding, // <<< UNIQUE PADDING HERE
+              //   padding: EdgeInsets.only(
+              //       left: 15, right: 15), // <<< UNIQUE PADDING HERE
+              //   child: VoiceRecorderBox(),
+              // ),
+
               const SizedBox(height: 12),
               Padding(
-                //padding: micHorizontalPadding, // <<< UNIQUE PADDING HERE
-                padding: EdgeInsets.only(
-                    left: 15, right: 15), // <<< UNIQUE PADDING HERE
-                child: VoiceRecorderBox(),
-              ),
-              const SizedBox(height: 12),
-              Padding(
-                //padding: micHorizontalPadding, // <<< UNIQUE PADDING HERE
                 padding: EdgeInsets.only(left: 15, right: 15),
                 child: AlternativePhoneField(
                   controller: _altPhoneController,
@@ -648,7 +612,27 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
                   },
                 ),
               ),
-              const SizedBox(height: 16),
+              //vehicle
+              const SizedBox(height: 12),
+              SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: CustomDropdownField<String>(
+                    hint: "Select Vehicle",
+                    value: _selectedVehicle,
+                    items: ["Bike", "Car", "Van","Cycle","Lorry","Truck","Train"]
+                        .map((v) => DropdownMenuItem(value: v, child: Text(v,
+                      style: MyTextStyle.f16(appPrimaryColor),)))
+                        .toList(),
+                    onChanged: (val) {
+                      setState(() => _selectedVehicle = val);
+                          },
+                          validator: (val) => val == null ? 'Please select a vehicle' : null,
+                        ),
+                      ),
+              ),
+
+      const SizedBox(height: 16),
               Padding(
                 padding: EdgeInsets.only(left: 15, right: 15),
                 child: MediaPreviewWidget(
@@ -659,6 +643,12 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
                       : _removeVideo(index),
                 ),
               ),
+              if (_selectedVehicle != null)
+                ChosenVehicleDetails(
+                  selectedVehicle: _selectedVehicle,
+                  totalKm: 3.5, // Replace with your real calculated KM later
+                ),
+
               const SizedBox(height: 24),
               SubmitButton(
                 formKey: _formKey,
@@ -687,7 +677,7 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
             automaticallyImplyLeading: false,
             elevation: 0,
             backgroundColor: appPrimaryColor,
-            title: Text("Person Pickup & Drop",
+            title: Text("Book Ride",
                 style: MyTextStyle.f20(whiteColor, weight: FontWeight.w600)),
             centerTitle: true,
             leading: InkWell(

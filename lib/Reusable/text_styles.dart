@@ -257,6 +257,7 @@ class MyTextStyle {
       fontWeight: weight ?? FontWeight.w500,
       decoration: textDecoration,
       decorationColor: decorationColor,
+
     );
   }
 
