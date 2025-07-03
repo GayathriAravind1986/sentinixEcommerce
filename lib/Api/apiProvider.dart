@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sentinix_ecommerce/Bloc/Response/errorResponse.dart';
+import 'package:sentinix_ecommerce/ModelClass/UserApp/Address/Post_address_model.dart';
 import 'package:sentinix_ecommerce/ModelClass/UserApp/Authentication/Post_User_Register_Model.dart';
 import 'package:sentinix_ecommerce/ModelClass/UserApp/Authentication/Post_login_model.dart';
 import 'package:sentinix_ecommerce/ModelClass/UserApp/Authentication/Post_login_otp_model.dart';
@@ -44,7 +45,7 @@ class ApiProvider {
       var dio = Dio();
       debugPrint("API baseUrl: ${Constants.userBaseUrl}");
       var response = await dio.request(
-        '${Constants.userBaseUrl}register'.trim(),
+        '${Constants.userBaseUrl}user/register'.trim(),
         options: Options(method: 'POST'),
         data: data,
       );
@@ -85,7 +86,7 @@ class ApiProvider {
       var dio = Dio();
       debugPrint("API baseUrl: ${Constants.userBaseUrl}");
       var response = await dio.request(
-        '${Constants.userBaseUrl}register/request-otp'.trim(),
+        '${Constants.userBaseUrl}user/register/request-otp'.trim(),
         options: Options(method: 'POST'),
         data: data,
       );
@@ -126,7 +127,7 @@ class ApiProvider {
       var dio = Dio();
       debugPrint("API baseUrl: ${Constants.userBaseUrl}");
       var response = await dio.request(
-        '${Constants.userBaseUrl}register/login-with-otp'.trim(),
+        '${Constants.userBaseUrl}user/register/login-with-otp'.trim(),
         options: Options(method: 'POST'),
         data: data,
       );
@@ -170,6 +171,70 @@ class ApiProvider {
     } catch (error) {
       debugPrint("ErrorCatch: $error");
       return PostLoginOtpModel()..errorResponse = handleError(error);
+    }
+  }
+
+  /// Address - Add API Integration
+  Future<PostAddressModel> addressAddAPI(
+    String latitude,
+    String longitude,
+    String mapLocation,
+    String flatAddress,
+    String floorNumber,
+    String apartmentName,
+    String streetName,
+    String areaName,
+    String pinCode,
+    String addressType,
+  ) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    var userId = sharedPreferences.getString("userId");
+    debugPrint("userIdAddress:$userId");
+    try {
+      final dataMap = {
+        "latitude": latitude,
+        "longtitude": longitude,
+        "maplocation": mapLocation,
+        "userId": userId,
+        "flatAddress": flatAddress,
+        "floorNumber": floorNumber,
+        "apartmentName": apartmentName,
+        "streetName": streetName,
+        "areaName": areaName,
+        "pinCode": pinCode,
+        "addressType": addressType
+      };
+
+      debugPrint(json.encode(dataMap));
+      var data = json.encode(dataMap);
+      var dio = Dio();
+      debugPrint("API baseUrl: ${Constants.userBaseUrl}");
+      var response = await dio.request(
+        '${Constants.userBaseUrl}settings/userAddress'.trim(),
+        options: Options(method: 'POST'),
+        data: data,
+      );
+
+      debugPrint("API statuscode: ${response.statusCode}");
+
+      if (response.statusCode == 200 && response.data != null) {
+        if (response.data['success'] == true) {
+          debugPrint("API Response: ${json.encode(response.data)}");
+          PostAddressModel postAddressResponse =
+              PostAddressModel.fromJson(response.data);
+          return postAddressResponse;
+        }
+      } else {
+        return PostAddressModel()
+          ..errorResponse = ErrorResponse(
+            message: "Error: ${response.data['message'] ?? 'Unknown error'}",
+          );
+      }
+      return PostAddressModel()
+        ..errorResponse = ErrorResponse(message: "Unexpected error occurred.");
+    } catch (error) {
+      debugPrint("ErrorCatch: $error");
+      return PostAddressModel()..errorResponse = handleError(error);
     }
   }
 

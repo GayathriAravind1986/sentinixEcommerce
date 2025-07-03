@@ -12,6 +12,7 @@ import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/Reusable/customTextfield.dart';
 import 'package:sentinix_ecommerce/Reusable/alternative_number.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Address/Steps/map_selection_step.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Navigation_Bar/Navigation_bar.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/GoogleMap/google_map_widget.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Person_Pickup_Drop/buildBannerSlider.dart';
@@ -21,7 +22,6 @@ import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Person_Pickup_
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Person_Pickup_Drop/buildVehicleOption.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Person_Pickup_Drop/buildPaymentRow.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Person_Pickup_Drop/buildSubmitButton.dart';
-import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Person_Pickup_Drop/add_address.dart';
 import 'package:sentinix_ecommerce/Reusable/customdropfield.dart';
 import 'package:sentinix_ecommerce/Reusable/chosen_vehicles.dart';
 
@@ -52,9 +52,6 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
   String? _selectedVehicle;
   late Timer _timer;
   LatLng? _selectedPosition;
-
-
-
 
   final _pickupControllers = [TextEditingController()];
   final _dropControllers = [TextEditingController()];
@@ -121,24 +118,25 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
   }
 
   Future<void> selectAddress(bool isPickup, int index) async {
-    final Address? selectedAddress = await Navigator.push(
+    //final Address? selectedAddress = await
+    Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => AddressFlowScreen(
-          initialPosition: _selectedPosition, // Now this will work
-        ),
+        builder: (context) => MapSelectionStep(fromTo: "ride"
+            //  initialPosition: _selectedPosition,
+            ),
       ),
     );
 
-    if (selectedAddress != null && mounted) {
-      setState(() {
-        if (isPickup) {
-          _pickupControllers[index].text = selectedAddress.fullAddress;
-        } else {
-          _dropControllers[index].text = selectedAddress.fullAddress;
-        }
-      });
-    }
+    // if (selectedAddress != null && mounted) {
+    //   setState(() {
+    //     if (isPickup) {
+    //       _pickupControllers[index].text = selectedAddress.fullAddress;
+    //     } else {
+    //       _dropControllers[index].text = selectedAddress.fullAddress;
+    //     }
+    //   });
+    // }
   }
 
   void _startAutoSlider() {
@@ -531,11 +529,13 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
                   showAddRemove: true,
                   onAdd: () {
                     if (_pickupControllers.length < 4) {
-                      setState(() => _pickupControllers.add(TextEditingController()));
+                      setState(() =>
+                          _pickupControllers.add(TextEditingController()));
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                            content: Text("Maximum 4 pickup locations allowed")),
+                            content:
+                                Text("Maximum 4 pickup locations allowed")),
                       );
                     }
                   },
@@ -557,11 +557,13 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
                   showAddRemove: true,
                   onAdd: () {
                     if (_dropControllers.length < 4) {
-                      setState(() => _dropControllers.add(TextEditingController()));
+                      setState(
+                          () => _dropControllers.add(TextEditingController()));
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                            content: Text("Maximum 4 pickup locations allowed")),
+                            content:
+                                Text("Maximum 4 pickup locations allowed")),
                       );
                     }
                   },
@@ -620,19 +622,32 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
                   child: CustomDropdownField<String>(
                     hint: "Select Vehicle",
                     value: _selectedVehicle,
-                    items: ["Bike", "Car", "Van","Cycle","Lorry","Truck","Train"]
-                        .map((v) => DropdownMenuItem(value: v, child: Text(v,
-                      style: MyTextStyle.f16(appPrimaryColor),)))
+                    items: [
+                      "Bike",
+                      "Car",
+                      "Van",
+                      "Cycle",
+                      "Lorry",
+                      "Truck",
+                      "Train"
+                    ]
+                        .map((v) => DropdownMenuItem(
+                            value: v,
+                            child: Text(
+                              v,
+                              style: MyTextStyle.f16(appPrimaryColor),
+                            )))
                         .toList(),
                     onChanged: (val) {
                       setState(() => _selectedVehicle = val);
-                          },
-                          validator: (val) => val == null ? 'Please select a vehicle' : null,
-                        ),
-                      ),
+                    },
+                    validator: (val) =>
+                        val == null ? 'Please select a vehicle' : null,
+                  ),
+                ),
               ),
 
-      const SizedBox(height: 16),
+              const SizedBox(height: 16),
               Padding(
                 padding: EdgeInsets.only(left: 15, right: 15),
                 child: MediaPreviewWidget(

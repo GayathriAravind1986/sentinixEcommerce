@@ -138,26 +138,26 @@ class _PickupDropViewState extends State<PickupDropView> {
     }
   }
 
-  Future<void> selectAddress(bool isPickup, int index) async {
-    final Address? selectedAddress = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AddressFlowScreen(
-          initialPosition: _selectedPosition, // Now this will work
-        ),
-      ),
-    );
-
-    if (selectedAddress != null && mounted) {
-      setState(() {
-        if (isPickup) {
-          _pickupControllers[index].text = selectedAddress.fullAddress;
-        } else {
-          _dropControllers[index].text = selectedAddress.fullAddress;
-        }
-      });
-    }
-  }
+  // Future<void> selectAddress(bool isPickup, int index) async {
+  //   final Address? selectedAddress = await Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) => AddressFlowScreen(
+  //         initialPosition: _selectedPosition, // Now this will work
+  //       ),
+  //     ),
+  //   );
+  //
+  //   if (selectedAddress != null && mounted) {
+  //     setState(() {
+  //       if (isPickup) {
+  //         _pickupControllers[index].text = selectedAddress.fullAddress;
+  //       } else {
+  //         _dropControllers[index].text = selectedAddress.fullAddress;
+  //       }
+  //     });
+  //   }
+  // }
 
   Future<String> getAddressFromLatLng(LatLng position) async {
     try {
@@ -616,7 +616,8 @@ class _PickupDropViewState extends State<PickupDropView> {
                         setState(() => _pickupControllers.removeLast());
                       }
                     },
-                    onTap: (index) => selectAddress(true, index),
+                    onTap: (index) => () {},
+                    //selectAddress(true, index),
                   ),
                 )
               else
@@ -628,7 +629,8 @@ class _PickupDropViewState extends State<PickupDropView> {
                     showAddRemove: false,
                     onAdd: () {},
                     onRemove: () {},
-                    onTap: (index) => selectAddress(true, index),
+                    onTap: (index) => () {},
+                    //selectAddress(true, index),
                   ),
                 ),
               if (_pickupType == 2)
@@ -655,7 +657,8 @@ class _PickupDropViewState extends State<PickupDropView> {
                         setState(() => _dropControllers.removeLast());
                       }
                     },
-                    onTap: (index) => selectAddress(false, index),
+                    onTap: (index) => () {},
+                    //selectAddress(false, index),
                   ),
                 )
               else
@@ -667,7 +670,7 @@ class _PickupDropViewState extends State<PickupDropView> {
                     showAddRemove: false,
                     onAdd: () {},
                     onRemove: () {},
-                    onTap: (index) => selectAddress(false, index),
+                    onTap: (index) => () {}, //selectAddress(false, index),
                   ),
                 ),
               Padding(

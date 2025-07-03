@@ -100,7 +100,6 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                     onPressed: _pickedLocation == null
                         ? null
                         : () {
-                            // Return the selected location
                             Navigator.pop(context, {
                               'location': _pickedLocation,
                               'address': _pickedAddress,
