@@ -1,33 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:sentinix_ecommerce/Alertbox/snackBarAlert.dart';
+import 'package:sentinix_ecommerce/Bloc/UserApp/Address/address_bloc.dart';
 import 'package:sentinix_ecommerce/Bloc/demo/demo_bloc.dart';
+import 'package:sentinix_ecommerce/ModelClass/UserApp/Address/Post_address_model.dart';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/Reusable/customTextfield.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Address/Steps/address_selection_step.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Parcel_Pickup_Drop/parcel_pickup_drop.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Person_Pickup_Drop/person_pickup_drop.dart';
 
 class AddressDetailsStep extends StatelessWidget {
-  final from;
+  final dynamic from;
+  final dynamic pinCode;
+  final dynamic address;
+  final double? lat;
+  final double? lon;
+  final dynamic area;
+  final dynamic city;
   const AddressDetailsStep({
     super.key,
     this.from,
+    this.pinCode,
+    this.address,
+    this.lat,
+    this.lon,
+    this.area,
+    this.city,
   });
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => DemoBloc(),
-      child: AddressDetailsStepView(from: from),
+      create: (_) => AddAddressBloc(),
+      child: AddressDetailsStepView(
+        from: from,
+        pinCode: pinCode,
+        address: address,
+        lat: lat,
+        lon: lon,
+        area: area,
+        city: city,
+      ),
     );
   }
 }
 
 class AddressDetailsStepView extends StatefulWidget {
-  final from;
+  final dynamic from;
+  final dynamic pinCode;
+  final dynamic address;
+  final double? lat;
+  final double? lon;
+  final dynamic area;
+  final dynamic city;
   const AddressDetailsStepView({
     super.key,
     this.from,
+    this.pinCode,
+    this.address,
+    this.lat,
+    this.lon,
+    this.area,
+    this.city,
   });
 
   @override
@@ -35,26 +72,26 @@ class AddressDetailsStepView extends StatefulWidget {
 }
 
 class AddressDetailsStepViewState extends State<AddressDetailsStepView> {
-  // GetUserDetailsModel getUserDetailsModel = GetUserDetailsModel();
-  // PostPolicyModel postPolicyModel = PostPolicyModel();
-  final _houseNoController = TextEditingController();
-  final _floorNoController = TextEditingController();
-  final _buildingController = TextEditingController();
-  final _streetController = TextEditingController();
-  final _areaController = TextEditingController();
-  final _customTypeController = TextEditingController();
+  PostAddressModel postAddressModel = PostAddressModel();
+
+  TextEditingController houseNoController = TextEditingController();
+  TextEditingController floorNoController = TextEditingController();
+  TextEditingController buildingController = TextEditingController();
+  TextEditingController streetController = TextEditingController();
+  TextEditingController areaController = TextEditingController();
+  TextEditingController customTypeController = TextEditingController();
   String _addressType = "HOME";
   String? _floorNumberError;
   bool _isFormValid = false;
 
   @override
   void dispose() {
-    _houseNoController.dispose();
-    _floorNoController.dispose();
-    _buildingController.dispose();
-    _streetController.dispose();
-    _areaController.dispose();
-    _customTypeController.dispose();
+    houseNoController.dispose();
+    floorNoController.dispose();
+    buildingController.dispose();
+    streetController.dispose();
+    areaController.dispose();
+    customTypeController.dispose();
     super.dispose();
   }
 
@@ -64,24 +101,24 @@ class AddressDetailsStepViewState extends State<AddressDetailsStepView> {
 
   void _validateForm() {
     setState(() {
-      _floorNumberError = _validateFloorNumber(_floorNoController.text)
+      _floorNumberError = _validateFloorNumber(floorNoController.text)
           ? null
           : "Only alphanumeric characters and hyphens allowed";
 
-      _isFormValid = _houseNoController.text.isNotEmpty &&
-          _floorNoController.text.isNotEmpty &&
+      _isFormValid = houseNoController.text.isNotEmpty &&
+          floorNoController.text.isNotEmpty &&
           _floorNumberError == null;
     });
   }
 
-  bool profileLoad = false;
+  /// KM calculation
+
+  bool addressLoad = false;
   String? errorMessage;
   @override
   void initState() {
     super.initState();
-    // context.read<UserDetailsBloc>().add(UserDetail());
-    // context.read<UserDetailsBloc>().add(Policy());
-    profileLoad = true;
+    areaController.text = widget.area;
   }
 
   @override
@@ -94,10 +131,7 @@ class AddressDetailsStepViewState extends State<AddressDetailsStepView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "",
-              // state.displayAddress.isNotEmpty
-              //     ? state.displayAddress
-              //     : state.selectedAddress,
+              widget.address ?? "",
               style: MyTextStyle.f16(textColorDark),
             ),
             const SizedBox(height: 8),
@@ -109,7 +143,7 @@ class AddressDetailsStepViewState extends State<AddressDetailsStepView> {
 
             // House/Flat Number (Required)
             CustomTextField(
-              controller: _houseNoController,
+              controller: houseNoController,
               hint: "House / Flat no *",
               onChanged: (value) => _validateForm(),
             ),
@@ -120,7 +154,7 @@ class AddressDetailsStepViewState extends State<AddressDetailsStepView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CustomTextField(
-                  controller: _floorNoController,
+                  controller: floorNoController,
                   hint: "Floor number *",
                   onChanged: (value) {
                     _validateForm();
@@ -140,45 +174,40 @@ class AddressDetailsStepViewState extends State<AddressDetailsStepView> {
 
             // Building/Apartment Name (Optional)
             CustomTextField(
-              controller: _buildingController,
+              controller: buildingController,
               hint: "Apartment / Building name (Optional)",
             ),
             const SizedBox(height: 16),
 
             // Street (Optional)
             CustomTextField(
-              controller: _streetController,
+              controller: streetController,
               hint: "Street (Optional)",
             ),
             const SizedBox(height: 16),
 
             // Area (Optional)
             CustomTextField(
-              controller: _areaController,
+              controller: areaController,
               hint: "Area/Locality (Optional)",
             ),
             const SizedBox(height: 16),
-
-            // Pincode (Display only)
-            //  if (state.selectedPincode?.isNotEmpty ?? false)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Pincode",
+                  "PinCode",
                   style: MyTextStyle.f14(greyColor),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "",
-                  // state.selectedPincode!,
+                  "${widget.pinCode}",
                   style: MyTextStyle.f16(textColorDark),
                 ),
                 const SizedBox(height: 16),
               ],
             ),
 
-            // Address Type Selection
             const SizedBox(height: 16),
             Text(
               "Save this address as *",
@@ -248,50 +277,54 @@ class AddressDetailsStepViewState extends State<AddressDetailsStepView> {
             if (_addressType == "OTHERS") ...[
               const SizedBox(height: 16),
               CustomTextField(
-                controller: _customTypeController,
+                controller: customTypeController,
                 hint: "Enter address type (e.g., Friend's place) (Optional)",
               ),
             ],
             const SizedBox(height: 32),
 
             // Add Address Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {},
-                // _isFormValid
-                //     ? () => bloc.add(AddAddressEvent(
-                //           context,
-                //           _houseNoController.text,
-                //           _floorNoController.text,
-                //           _buildingController.text.isNotEmpty
-                //               ? _buildingController.text
-                //               : null,
-                //           _streetController.text.isNotEmpty
-                //               ? _streetController.text
-                //               : null,
-                //           _areaController.text.isNotEmpty
-                //               ? _areaController.text
-                //               : null,
-                //           _addressType,
-                //           _addressType == "OTHERS"
-                //               ? _customTypeController.text
-                //               : null,
-                //         ))
-                //     : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _isFormValid ? appPrimaryColor : greyColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+            addressLoad
+                ? const SpinKitCircle(color: appPrimaryColor, size: 30)
+                : SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (_isFormValid) {
+                          setState(() {
+                            addressLoad = true;
+                          });
+                          context.read<AddAddressBloc>().add(AddAddress(
+                                (widget.lat ?? 0.0).toString(),
+                                (widget.lon ?? 0.0).toString(),
+                                widget.city,
+                                houseNoController.text,
+                                floorNoController.text,
+                                buildingController.text,
+                                streetController.text,
+                                areaController.text,
+                                widget.pinCode,
+                                _addressType == "OTHERS"
+                                    ? customTypeController.text
+                                    : _addressType,
+                              ));
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            _isFormValid ? appPrimaryColor : greyColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: Text(
+                        "Add Address",
+                        style: MyTextStyle.f18(whiteColor,
+                            weight: FontWeight.bold),
+                      ),
+                    ),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: Text(
-                  "Add Address",
-                  style: MyTextStyle.f18(whiteColor, weight: FontWeight.bold),
-                ),
-              ),
-            ),
           ],
         ),
       );
@@ -330,9 +363,48 @@ class AddressDetailsStepViewState extends State<AddressDetailsStepView> {
             ),
           ),
         ),
-        body: BlocBuilder<DemoBloc, dynamic>(
+        body: BlocBuilder<AddAddressBloc, dynamic>(
           buildWhen: ((previous, current) {
             debugPrint("current:$current");
+            if (current is PostAddressModel) {
+              postAddressModel = current;
+              if (current.errorResponse != null) {
+                if (current.errorResponse!.errors != null &&
+                    current.errorResponse!.errors!.isNotEmpty) {
+                  errorMessage = current.errorResponse!.errors![0].message ??
+                      "Something went wrong";
+                } else {
+                  errorMessage = "Something went wrong";
+                }
+                showToast("$errorMessage", context, color: false);
+                setState(() {
+                  addressLoad = false;
+                });
+              } else if (postAddressModel.success == true) {
+                if (postAddressModel.data!.status == true) {
+                  setState(() {
+                    addressLoad = false;
+                  });
+                  if (widget.from == "ride") {
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => PersonPickupDropScreen()));
+                  } else {
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (_) => PickupDropScreen()));
+                  }
+                }
+                if (postAddressModel.data!.status == false) {
+                  showToast('${postAddressModel.data!.message}', context,
+                      color: false);
+                  setState(() {
+                    addressLoad = false;
+                  });
+                }
+              }
+              return true;
+            }
             return false;
           }),
           builder: (context, dynamic) {

@@ -1,20 +1,17 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter/services.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:sentinix_ecommerce/Bloc/demo/demo_bloc.dart';
 import 'package:sentinix_ecommerce/Reusable/color.dart';
 import 'package:sentinix_ecommerce/Reusable/customTextfield.dart';
 import 'package:sentinix_ecommerce/Reusable/alternative_number.dart';
 import 'package:sentinix_ecommerce/Reusable/text_styles.dart';
-import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Address/Steps/map_selection_step.dart';
+import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Address/Steps/address_selection_step.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Navigation_Bar/Navigation_bar.dart';
-import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/GoogleMap/google_map_widget.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Person_Pickup_Drop/buildBannerSlider.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Person_Pickup_Drop/buildLocationFileds.dart';
 import 'package:sentinix_ecommerce/UI/UserApp/Landing/Home_Screen/Person_Pickup_Drop/buildMediaPreview.dart';
@@ -47,12 +44,10 @@ class PersonPickupDropView extends StatefulWidget {
 class _PersonPickupDropViewState extends State<PersonPickupDropView> {
   final _formKey = GlobalKey<FormState>();
   final _pageController = PageController();
-  int _currentPage = 0;
+  int currentPage = 0;
   String _selectedPaymentMethod = 'COD';
   String? _selectedVehicle;
-  late Timer _timer;
-  LatLng? _selectedPosition;
-
+  Timer? _autoSlideTimer;
   final _pickupControllers = [TextEditingController()];
   final _dropControllers = [TextEditingController()];
   final _packageController = TextEditingController();
@@ -63,7 +58,9 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
   final List<File> _videoFiles = [];
   final ImagePicker _picker = ImagePicker();
   bool _isShowingImages = true;
-
+  List<LatLng?> pickupCoordinates = [];
+  List<LatLng?> dropCoordinates = [];
+  double totalKm = 0.0;
   final List<String> _banners = [
     'assets/image/banner_1.png',
     'assets/image/banner_2.jpg',
@@ -78,89 +75,169 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
 
   @override
   void dispose() {
-    _timer.cancel();
+    _autoSlideTimer?.cancel();
     _pageController.dispose();
     _packageController.dispose();
     _instructionController.dispose();
     _altPhoneController.dispose();
-    for (var c in _pickupControllers) c.dispose();
-    for (var c in _dropControllers) c.dispose();
+    for (var c in _pickupControllers) {
+      c.dispose();
+    }
+    for (var c in _dropControllers) {
+      c.dispose();
+    }
     super.dispose();
   }
 
-  Future<String> getAddressFromLatLng(LatLng position) async {
-    try {
-      List<Placemark> addressLatLon = await placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
+  double calculateDistanceInKm(
+      double lat1, double lon1, double lat2, double lon2) {
+    const double earthRadius = 6371;
+
+    double dLat = _deg2rad(lat2 - lat1);
+    double dLon = _deg2rad(lon2 - lon1);
+
+    double a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(_deg2rad(lat1)) *
+            cos(_deg2rad(lat2)) *
+            sin(dLon / 2) *
+            sin(dLon / 2);
+
+    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+    return earthRadius * c;
+  }
+
+  double _deg2rad(double deg) => deg * (pi / 180);
+
+  List<Map<String, double>> convertLatLngListToMapList(List<LatLng> locations) {
+    return locations
+        .map((latLng) => {
+              'lat': latLng.latitude,
+              'lon': latLng.longitude,
+            })
+        .toList();
+  }
+
+  double calculateTotalDistance(
+      List<Map<String, double>> pickups, List<Map<String, double>> drops) {
+    double totalDistance = 0.0;
+
+    // Distance between pickups
+    for (int i = 0; i < pickups.length - 1; i++) {
+      totalDistance += calculateDistanceInKm(
+        pickups[i]['lat']!,
+        pickups[i]['lng']!,
+        pickups[i + 1]['lat']!,
+        pickups[i + 1]['lng']!,
       );
-      final Placemark place = addressLatLon.first;
-      final placeName = place.name ?? '';
-      final streetName = place.thoroughfare ?? place.subLocality ?? '';
-      final subLocality = place.subLocality ?? '';
-      final city = place.locality ?? '';
-      final state = place.administrativeArea ?? '';
-      final country = place.country ?? '';
-      debugPrint("placeName:${place.name}");
-      debugPrint("placeStreet:${place.street}");
-      debugPrint("placeSub:${place.subLocality}");
-      debugPrint("placeThoro:${place.thoroughfare}");
-      debugPrint("placeLoc:${place.locality}");
-      debugPrint("placeAdmin:${place.administrativeArea}");
-      debugPrint("placeCountry:${place.country}");
-      return [streetName, city, state, country]
-          .where((part) => part.isNotEmpty)
-          .join(', ');
-    } catch (e) {
-      debugPrint("Error during reverse geocoding: $e");
-      return "Address not found";
     }
+
+    // Pickup to first drop
+    if (pickups.isNotEmpty && drops.isNotEmpty) {
+      totalDistance += calculateDistanceInKm(
+        pickups.last['lat']!,
+        pickups.last['lng']!,
+        drops.first['lat']!,
+        drops.first['lng']!,
+      );
+    }
+
+    // Distance between drops
+    for (int i = 0; i < drops.length - 1; i++) {
+      totalDistance += calculateDistanceInKm(
+        drops[i]['lat']!,
+        drops[i]['lng']!,
+        drops[i + 1]['lat']!,
+        drops[i + 1]['lng']!,
+      );
+    }
+
+    return totalDistance;
   }
 
   Future<void> selectAddress(bool isPickup, int index) async {
-    //final Address? selectedAddress = await
-    Navigator.push(
+    final selectedAddress = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MapSelectionStep(fromTo: "ride"
-            //  initialPosition: _selectedPosition,
-            ),
+        builder: (context) => AddressSelectionStep(fromTo: "ride"),
       ),
     );
 
-    // if (selectedAddress != null && mounted) {
-    //   setState(() {
-    //     if (isPickup) {
-    //       _pickupControllers[index].text = selectedAddress.fullAddress;
-    //     } else {
-    //       _dropControllers[index].text = selectedAddress.fullAddress;
-    //     }
-    //   });
-    // }
+    if (selectedAddress != null && mounted) {
+      debugPrint("Selected Address: $selectedAddress");
+
+      final lat = selectedAddress.latitude;
+      final lon = selectedAddress.longtitude;
+      debugPrint("Selected LatLng: ($lat, $lon)");
+
+      // Format address
+      String formattedAddress = [
+        if (selectedAddress.flatAddress?.isNotEmpty ?? false)
+          'House No: ${selectedAddress.flatAddress}',
+        if (selectedAddress.floorNumber != null)
+          'Floor No: ${selectedAddress.floorNumber}',
+        if (selectedAddress.apartmentName?.isNotEmpty ?? false)
+          selectedAddress.apartmentName,
+        if (selectedAddress.streetName?.isNotEmpty ?? false)
+          selectedAddress.streetName,
+        if (selectedAddress.areaName?.isNotEmpty ?? false)
+          selectedAddress.areaName,
+        if (selectedAddress.maplocation?.isNotEmpty ?? false)
+          selectedAddress.maplocation,
+        if ((selectedAddress.pinCode?.toString().isNotEmpty ?? false))
+          selectedAddress.pinCode,
+      ]
+          .where((part) => part != null && part.toString().trim().isNotEmpty)
+          .join(', ');
+
+      setState(() {
+        if (isPickup) {
+          _pickupControllers[index].text = formattedAddress;
+
+          // Store coordinates
+          if (pickupCoordinates.length > index) {
+            pickupCoordinates[index] =
+                LatLng(selectedAddress.latitude, selectedAddress.longtitude);
+            debugPrint("pickUpCoordinate:$pickupCoordinates");
+          } else {
+            pickupCoordinates.add(
+                LatLng(selectedAddress.latitude, selectedAddress.longtitude));
+            debugPrint("pickupCoordinates:$pickupCoordinates");
+          }
+
+          debugPrint("pickUp:${_pickupControllers[index].text}");
+        } else {
+          _dropControllers[index].text = formattedAddress;
+
+          if (dropCoordinates.length > index) {
+            dropCoordinates[index] =
+                LatLng(selectedAddress.latitude, selectedAddress.longtitude);
+            debugPrint("dropCoordinates:$dropCoordinates");
+          } else {
+            dropCoordinates.add(
+                LatLng(selectedAddress.latitude, selectedAddress.longtitude));
+            debugPrint("dropCoordinates:$dropCoordinates");
+          }
+
+          debugPrint("drop:${_dropControllers[index].text}");
+        }
+      });
+    }
   }
 
   void _startAutoSlider() {
-    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
-      if (mounted) {
-        setState(() {
-          _currentPage = (_currentPage + 1) % _banners.length;
-          _pageController.animateToPage(
-            _currentPage,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          );
-        });
-      }
-    });
-  }
+    _autoSlideTimer = Timer.periodic(Duration(seconds: 3), (timer) {
+      if (!mounted || !_pageController.hasClients) return;
 
-  String? _validatePhoneNumber(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Phone number is required';
-    }
-    if (!RegExp(r'^[0-9]+$').hasMatch(value)) return 'Only numbers are allowed';
-    if (value.length != 10) return 'Enter 10-digit number';
-    return null;
+      setState(() {
+        if (_pageController.hasClients) {
+          _pageController.animateToPage(
+            currentPage,
+            duration: Duration(milliseconds: 300),
+            curve: Curves.easeIn,
+          );
+        }
+      });
+    });
   }
 
   Future<void> _pickMedia(ImageSource source) async {
@@ -506,12 +583,26 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
 
   @override
   Widget build(BuildContext context) {
+    if (pickupCoordinates.isNotEmpty && dropCoordinates.isNotEmpty) {
+      List<Map<String, double>> pickupPoints = pickupCoordinates
+          .whereType<LatLng>()
+          .map((e) =>
+              {'lat': e.latitude, 'lng': e.longitude}) // 'lng', not 'lon'
+          .toList();
+
+      List<Map<String, double>> dropPoints = dropCoordinates
+          .whereType<LatLng>()
+          .map((e) => {'lat': e.latitude, 'lng': e.longitude})
+          .toList();
+      totalKm = calculateTotalDistance(pickupPoints, dropPoints);
+      debugPrint("totalKm:${totalKm.toStringAsFixed(2)}");
+    }
     Widget mainContainer() {
       const EdgeInsetsGeometry fieldHorizontalPadding = EdgeInsets.symmetric(
           horizontal: 8.0); // Example: adjust as needed for text fields
 
-      const EdgeInsetsGeometry micHorizontalPadding = EdgeInsets.symmetric(
-          horizontal: 0.0); // Example: adjust as needed for mic box
+      // const EdgeInsetsGeometry micHorizontalPadding = EdgeInsets.symmetric(
+      //     horizontal: 0.0); // Example: adjust as needed for mic box
 
       return SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -541,7 +632,42 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
                   },
                   onRemove: () {
                     if (_pickupControllers.length > 1) {
-                      setState(() => _pickupControllers.removeLast());
+                      setState(() {
+                        _pickupControllers.removeLast();
+
+                        // Remove the last pickup coordinate safely
+                        if (pickupCoordinates.isNotEmpty) {
+                          pickupCoordinates.removeLast();
+                          debugPrint("pickupCoorremove:$pickupCoordinates");
+                        }
+
+                        // Recalculate totalKm if both lists are still valid
+                        if (pickupCoordinates.isNotEmpty &&
+                            dropCoordinates.isNotEmpty) {
+                          List<Map<String, double>> pickupPoints =
+                              pickupCoordinates
+                                  .whereType<LatLng>()
+                                  .map((e) => {
+                                        'lat': e.latitude,
+                                        'lng': e.longitude,
+                                      })
+                                  .toList();
+
+                          List<Map<String, double>> dropPoints = dropCoordinates
+                              .whereType<LatLng>()
+                              .map((e) => {
+                                    'lat': e.latitude,
+                                    'lng': e.longitude,
+                                  })
+                              .toList();
+
+                          totalKm =
+                              calculateTotalDistance(pickupPoints, dropPoints);
+                          debugPrint("totalKm: ${totalKm.toStringAsFixed(2)}");
+                        } else {
+                          totalKm = 0.0;
+                        }
+                      });
                     }
                   },
                   onTap: (index) => selectAddress(true, index),
@@ -569,13 +695,49 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
                   },
                   onRemove: () {
                     if (_dropControllers.length > 1) {
-                      setState(() => _dropControllers.removeLast());
+                      setState(() {
+                        _dropControllers.removeLast();
+
+                        // Remove the last drop coordinate
+                        if (dropCoordinates.isNotEmpty) {
+                          dropCoordinates.removeLast();
+                          debugPrint("dropCoorremove:$dropCoordinates");
+                        }
+
+                        // Recalculate totalKm if both lists are not empty
+                        if (pickupCoordinates.isNotEmpty &&
+                            dropCoordinates.isNotEmpty) {
+                          List<Map<String, double>> pickupPoints =
+                              pickupCoordinates
+                                  .whereType<LatLng>()
+                                  .map((e) => {
+                                        'lat': e.latitude,
+                                        'lng': e.longitude,
+                                      })
+                                  .toList();
+
+                          List<Map<String, double>> dropPoints = dropCoordinates
+                              .whereType<LatLng>()
+                              .map((e) => {
+                                    'lat': e.latitude,
+                                    'lng': e.longitude,
+                                  })
+                              .toList();
+
+                          totalKm =
+                              calculateTotalDistance(pickupPoints, dropPoints);
+                          debugPrint("totalKm: $totalKm");
+                        } else {
+                          totalKm = 0.0;
+                        }
+                      });
                     }
                   },
-                  onTap: (index) => selectAddress(true, index),
+                  onTap: (index) => selectAddress(false, index),
                 ),
               ),
               const SizedBox(height: 12),
+              Text("Maximum 4 pickup locations allowed"),
               Padding(
                 padding: fieldHorizontalPadding,
                 child: CustomTextField(
@@ -610,7 +772,7 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
                 child: AlternativePhoneField(
                   controller: _altPhoneController,
                   onPhoneChanged: (val) {
-                    print("Alt Phone: $val");
+                    debugPrint("Alt Phone: $val");
                   },
                 ),
               ),
@@ -653,8 +815,8 @@ class _PersonPickupDropViewState extends State<PersonPickupDropView> {
               if (_selectedVehicle != null) ...[
                 ChosenVehicleInfo(
                   selectedVehicle: _selectedVehicle!,
-                  totalKm: 5.0, // Example value
-                  totalMinutes: 4, // Example value
+                  totalKm: totalKm.round().toDouble(),
+                  totalMinutes: (totalKm / 0.5).round(),
                 ),
               ],
               const SizedBox(height: 24),

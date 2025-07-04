@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sentinix_ecommerce/Bloc/Response/errorResponse.dart';
+import 'package:sentinix_ecommerce/ModelClass/UserApp/Address/Get_address_model.dart';
 import 'package:sentinix_ecommerce/ModelClass/UserApp/Address/Post_address_model.dart';
 import 'package:sentinix_ecommerce/ModelClass/UserApp/Authentication/Post_User_Register_Model.dart';
 import 'package:sentinix_ecommerce/ModelClass/UserApp/Authentication/Post_login_model.dart';
@@ -189,7 +190,9 @@ class ApiProvider {
   ) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     var userId = sharedPreferences.getString("userId");
+    var token = sharedPreferences.getString("token");
     debugPrint("userIdAddress:$userId");
+    debugPrint("token:$token");
     try {
       final dataMap = {
         "latitude": latitude,
@@ -211,7 +214,13 @@ class ApiProvider {
       debugPrint("API baseUrl: ${Constants.userBaseUrl}");
       var response = await dio.request(
         '${Constants.userBaseUrl}settings/userAddress'.trim(),
-        options: Options(method: 'POST'),
+        options: Options(
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        ),
         data: data,
       );
 
@@ -235,6 +244,47 @@ class ApiProvider {
     } catch (error) {
       debugPrint("ErrorCatch: $error");
       return PostAddressModel()..errorResponse = handleError(error);
+    }
+  }
+
+  /// Address - Fetch API Integration
+  Future<GetAddressModel> addressFetchAPI() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    var userId = sharedPreferences.getString("userId");
+    var token = sharedPreferences.getString("token");
+    debugPrint("userIdAddress:$userId");
+    debugPrint("token:$token");
+    try {
+      var dio = Dio();
+      var response = await dio.request(
+        '${Constants.userBaseUrl}booking/ride/useraddress/$userId',
+        options: Options(
+          method: 'GET',
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+      debugPrint("API statuscode: ${response.statusCode}");
+
+      if (response.statusCode == 200 && response.data != null) {
+        if (response.data['success'] == true) {
+          debugPrint("API Response: ${json.encode(response.data)}");
+          GetAddressModel getAddressResponse =
+              GetAddressModel.fromJson(response.data);
+          return getAddressResponse;
+        }
+      } else {
+        return GetAddressModel()
+          ..errorResponse = ErrorResponse(
+            message: "Error: ${response.data['message'] ?? 'Unknown error'}",
+          );
+      }
+      return GetAddressModel()
+        ..errorResponse = ErrorResponse(message: "Unexpected error occurred.");
+    } catch (error) {
+      debugPrint("ErrorCatch: $error");
+      return GetAddressModel()..errorResponse = handleError(error);
     }
   }
 

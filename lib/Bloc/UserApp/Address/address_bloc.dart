@@ -28,11 +28,7 @@ class AddAddress extends AddAddressEvent {
   );
 }
 
-class AddAddressWithOtp extends AddAddressEvent {
-  String phone;
-  String otp;
-  AddAddressWithOtp(this.phone, this.otp);
-}
+class FetchAddress extends AddAddressEvent {}
 
 class AddAddressBloc extends Bloc<AddAddressEvent, dynamic> {
   AddAddressBloc() : super(dynamic) {
@@ -56,10 +52,8 @@ class AddAddressBloc extends Bloc<AddAddressEvent, dynamic> {
         emit(error);
       });
     });
-    on<AddAddressWithOtp>((event, emit) async {
-      await ApiProvider()
-          .loginWithOtpUserAPI(event.phone, event.otp)
-          .then((value) {
+    on<FetchAddress>((event, emit) async {
+      await ApiProvider().addressFetchAPI().then((value) {
         emit(value);
       }).catchError((error) {
         emit(error);
